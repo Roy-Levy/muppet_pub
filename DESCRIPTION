@@ -11,3 +11,4 @@ Description: Conducts MUPPET modeling for latent variable and structural equatio
 License: MIT
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.3.2
