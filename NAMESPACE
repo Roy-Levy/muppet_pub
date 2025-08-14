@@ -1,0 +1,5 @@
+export(MUPPET.modular.function)
+export(df_to_mcmc_list)
+export(mcmcplot.mod)
+export(simulate_ordinal_factor_data)
+
