@@ -7,6 +7,22 @@ library(lavaan)
 library(MASS)  # For mvrnorm function
 
 # Function to simulate categorical data from a 1-factor probit model
+#' Simulate categorical data from a 1-factor probit model
+#'
+#' @description
+#' Simulates categorical data from a 1-factor probit model. The model assumes the latent variable is normally distributed with a mean of 0. The model is akin to a latent response variable formulation where the underlying latent response variable for a person's item response is formed by the product of the loading and latent variable, and then a N(0,1) residual is added. The underlying latent variable is then discretized via the item thresholds, yielding a categorical response variable.
+#'
+#' @param n_obs The number of cases, subjects, participants in the dataset to be generated. Default is 500.
+#' @param n_items The number of items in the dataset to be generated. Default is 5.
+#' @param n_categories The number of response categories for the item responses. One value applies to all items. Default is 2.
+#' @param lowest_category The value of the lowest response category (usually 0 or 1). Default is 0.
+#' @param factor_loadings A vector of length n_items with factor loadings (1 per item). If no vector is provided, defaults to simulating from a Uniform distribution(.5, .8) distribution.
+#' @param thresholds A matrix of thresholds. Each row in the matrix contains the thresholds for that item. There should be one fewer columns than the number of categories. If no matrix is provided, defaults to each item having thresholds equally spaced out between -2 and 2.
+#' @param latent_var_sd The value of the standard deviation of the latent variable. Default is 1.
+#'
+#' @return A list, including: data, the simulated item response data; model, an expression of the model used for generating the data; true_loadings, the loadings used for simulating the data; true_thresholds, the thresholds used for simulating the data; underlying_latent_variable_responses, the matrix of simulated latent response variables (one per case per item).
+#' @export
+#'
 simulate_ordinal_factor_data <- function(n_obs = 500,
                                          n_items = 5,
                                          n_categories = 2,
