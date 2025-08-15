@@ -20,7 +20,13 @@ library(MASS)  # For mvrnorm function
 #' @param thresholds A matrix of thresholds. Each row in the matrix contains the thresholds for that item. There should be one fewer columns than the number of categories. If no matrix is provided, defaults to each item having thresholds equally spaced out between -2 and 2.
 #' @param latent_var_sd The value of the standard deviation of the latent variable. Default is 1.
 #'
-#' @return A list, including: data, the simulated item response data; model, an expression of the model used for generating the data; true_loadings, the loadings used for simulating the data; true_thresholds, the thresholds used for simulating the data; underlying_latent_variable_responses, the matrix of simulated latent response variables (one per case per item).
+#' @return A list containing:
+#'  \item{data}{The simulated item response data.}
+#'  \item{model}{An expression of the model used for generating the data.}
+#'  \item{true_loadings}{The loadings used for generating the data.}
+#'  \item{true_thresholds}{The thresholds used for generating the data.}
+#'  \item{underlying_latent_variable_responses}{The matrix of simulated latent
+#'  response variables (one per case per item).}
 #' @export
 #'
 simulate_ordinal_factor_data <- function(n_obs = 500,

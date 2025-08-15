@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcmcplot modified function.R
 \name{mcmcplot.mod}
 \alias{mcmcplot.mod}
-\title{Plotting function mcmcplot() from mcmcplots() package modified to not automatically open the html}
+\title{Plot MCMC draws}
 \usage{
 mcmcplot.mod(...)
 }
@@ -13,7 +13,7 @@ mcmcplot.mod(...)
 See mcmcplot() from mcmcplots() package.
 }
 \description{
-Plotting function mcmcplot() from mcmcplots() package modified to not automatically open the html
+A modified version of the mcmcplot() function from the mcmcplots. Modified to not automatically open the html file that is created. This version creates and saves various plots and an HTML file collecting them (but does not automatically open the HTML file.)
 }
 \examples{
 See mcmcplot() from mcmcplots() package.

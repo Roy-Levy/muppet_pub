@@ -31,7 +31,13 @@ simulate_ordinal_factor_data(
 \item{latent_var_sd}{The value of the standard deviation of the latent variable. Default is 1.}
 }
 \value{
-A list, including: data, the simulated item response data; model, an expression of the model used for generating the data; true_loadings, the loadings used for simulating the data; true_thresholds, the thresholds used for simulating the data; underlying_latent_variable_responses, the matrix of simulated latent response variables (one per case per item).
+A list containing:
+ \item{data}{The simulated item response data.}
+ \item{model}{An expression of the model used for generating the data.}
+ \item{true_loadings}{The loadings used for generating the data.}
+ \item{true_thresholds}{The thresholds used for generating the data.}
+ \item{underlying_latent_variable_responses}{The matrix of simulated latent
+ response variables (one per case per item).}
 }
 \description{
 Simulates categorical data from a 1-factor probit model. The model assumes the latent variable is normally distributed with a mean of 0. The model is akin to a latent response variable formulation where the underlying latent response variable for a person's item response is formed by the product of the loading and latent variable, and then a N(0,1) residual is added. The underlying latent variable is then discretized via the item thresholds, yielding a categorical response variable.
