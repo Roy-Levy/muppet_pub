@@ -1,21 +1,22 @@
-#' Converts a dataframe to an mcmc.list object
+#' @importFrom coda mcmc.list
+#'
+#' @title Converts a dataframe to an mcmc.list object
 #'
 #' @param df The dataframe to be converted to an mcmc.list object
 #' @param chain_col Do not alter
 #' @param iter_col Do not alter
 #'
 #' @return An mcmc.list object
-#' @export
 #'
 #'
 df_to_mcmc_list <- function(df, chain_col = "Chain.number", iter_col = "Iteration.number") {
-  # Check if coda package is installed and load it
-  if (!requireNamespace("coda", quietly = TRUE)) {
-    install.packages("coda")
-    library(coda)
-  } else {
-    library(coda)
-  }
+  # # Check if coda package is installed and load it
+  # if (!requireNamespace("coda", quietly = TRUE)) {
+  #   install.packages("coda")
+  #   library(coda)
+  # } else {
+  #   library(coda)
+  # }
 
   # Ensure the required columns exist
   if (!(chain_col %in% colnames(df))) {

@@ -1,7 +1,7 @@
 Package: muppet
 Type: Package
 Title: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
   person(given = "Roy",
          family = "Levy",
@@ -12,3 +12,17 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
+Imports: 
+    MplusAutomation,
+    readr,
+    dplyr,
+    tibble,
+    stringr,
+    coda,
+    MCMCvis,
+    mcmcplots,
+    foreach,
+    parallel,
+    doParallel,
+    Hmisc,
+    tinytable

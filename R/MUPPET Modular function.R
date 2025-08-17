@@ -2,11 +2,21 @@
 # Via a fully modular approach
 
 
-
-#' Modular MUPPET Analysis
+#' @import dplyr
+#' @import MCMCvis
+#' @import coda
+#' @import parallel
+#' @import foreach
+#' @import doParallel
+#' @import stringr
+#' @import MplusAutomation
+#' @import tinytable
+#' @importFrom Hmisc capitalize
 #'
-#' Conducts modular MUPPET modeling.
-
+#' @title MUPPET Analysis
+#'
+#' @description  Conducts modular MUPPET modeling.
+#'
 #' @param n.chains The number of Markov chains to run in each unconditional fragment. Default is 2.
 
 #' @param n.warmup The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..

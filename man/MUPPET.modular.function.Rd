@@ -2,7 +2,7 @@
 % Please edit documentation in R/MUPPET Modular function.R
 \name{MUPPET.modular.function}
 \alias{MUPPET.modular.function}
-\title{Modular MUPPET Analysis}
+\title{MUPPET Analysis}
 \usage{
 MUPPET.modular.function(
   n.chains = 2,
