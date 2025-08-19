@@ -637,10 +637,6 @@ MUPPET.modular.function <- function(
                 # Write out the table
                 table.to.write <- loadings.table
 
-                sink("Checkpoint.out", append = TRUE)
-                print("Checkpoint 6")
-                sink()
-
                 # sort it
                 table.to.write <- dplyr::arrange(table.to.write, Parameter)
 
@@ -651,11 +647,14 @@ MUPPET.modular.function <- function(
                 # Write out the table
                 if(nrow(table.to.write) >0){
                   file.name <- paste0(fragments[[which.fragment]]$name, " unstandardized loadings summary statistics.docx")
-                  tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
+                  # tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
+                  temp.table.tt <- tt(table.to.write)
+                  save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
 
                 }
+
                 sink("Checkpoint.out", append = TRUE)
-                print("Checkpoint 8")
+                print("Checkpoint 7")
                 sink()
 
                 # * * * intercepts and means -----
