@@ -180,8 +180,10 @@ MUPPET.modular.function <- function(
 ){
 
 
-  # Define the operator from rlang that tinytable seems to have trouble importing -----
-  `%||%` <- function(x, y) if (is.null(x)) y else x
+  # To delete
+
+  # # Define the operator from rlang that tinytable seems to have trouble importing -----
+  # `%||%` <- function(x, y) if (is.null(x)) y else x
 
 
 
@@ -653,9 +655,15 @@ MUPPET.modular.function <- function(
                 # Write out the table
                 if(nrow(table.to.write) >0){
                   file.name <- paste0(fragments[[which.fragment]]$name, " unstandardized loadings summary statistics.docx")
+
                   # tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
+
                   temp.table.tt <- tinytable::tt(table.to.write)
-                  tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
+
+                  print(paste0("Attempting to save to: ", file.name))
+
+                  # tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
+                  tinytable::save_tt(temp.table.tt, "test.docx", overwrite=TRUE)
 
                 }
 
