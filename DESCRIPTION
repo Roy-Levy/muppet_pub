@@ -25,4 +25,5 @@ Imports:
     parallel,
     doParallel,
     Hmisc,
-    tinytable
+    tinytable,
+    rlang

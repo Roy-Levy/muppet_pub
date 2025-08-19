@@ -13,6 +13,7 @@
 #' @import tinytable
 #' @import readr
 #' @import tibble
+#' @import rlang
 #'
 #' @importFrom Hmisc capitalize
 #'
