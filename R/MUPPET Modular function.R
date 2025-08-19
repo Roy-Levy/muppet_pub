@@ -611,16 +611,8 @@ MUPPET.modular.function <- function(
 
               }
 
-              sink("Checkpoint.out", append = TRUE)
-              print("Checkpoint 1")
-              sink()
-
               # * * unstandardized solution -----
               if(1==1){
-
-                sink("Checkpoint.out", append = TRUE)
-                print("Checkpoint 2")
-                sink()
 
                   working.table <- working.table.all.parameters %>%
                   filter(
@@ -628,19 +620,12 @@ MUPPET.modular.function <- function(
                   )
 
 
-                  sink("Checkpoint.out", append = TRUE)
-                  print("Checkpoint 3")
-                  sink()
-
                 # * * Remove text before a character from the parameter names -----
                 working.table$Parameter <- remove_prefix_function(
                   text_vector = working.table$Parameter,
                   delimiter = "_" # will remove text before (and including) the first instance of this character
                 )
 
-                  sink("Checkpoint.out", append = TRUE)
-                  print("Checkpoint 4")
-                  sink()
 
                 # * * * loadings -----
                 loadings.table <- working.table %>%
@@ -648,15 +633,20 @@ MUPPET.modular.function <- function(
                     grepl("\\.BY\\.", Parameter, ignore.case = TRUE)
                   )
 
-                  sink("Checkpoint.out", append = TRUE)
-                  print("Checkpoint 5")
-                  sink()
 
                 # Write out the table
                 table.to.write <- loadings.table
 
+                sink("Checkpoint.out", append = TRUE)
+                print("Checkpoint 6")
+                sink()
+
                 # sort it
                 table.to.write <- dplyr::arrange(table.to.write, Parameter)
+
+                sink("Checkpoint.out", append = TRUE)
+                print("Checkpoint 7")
+                sink()
 
                 # Write out the table
                 if(nrow(table.to.write) >0){
@@ -664,7 +654,9 @@ MUPPET.modular.function <- function(
                   tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
 
                 }
-
+                sink("Checkpoint.out", append = TRUE)
+                print("Checkpoint 8")
+                sink()
 
                 # * * * intercepts and means -----
                 intercepts.and.means.table <- working.table %>%
