@@ -180,6 +180,12 @@ MUPPET.modular.function <- function(
 ){
 
 
+  # Define the operator from rlang that tinytable seems to have trouble importing -----
+  `%||%` <- function(x, y) if (is.null(x)) y else x
+
+
+
+
   # Sink out file with some session info -----
       sink("R Session Info.out")
 
@@ -649,7 +655,7 @@ MUPPET.modular.function <- function(
                   file.name <- paste0(fragments[[which.fragment]]$name, " unstandardized loadings summary statistics.docx")
                   # tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
                   temp.table.tt <- tinytable::tt(table.to.write)
-                  # tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
+                  tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
 
                 }
 
