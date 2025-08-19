@@ -648,8 +648,8 @@ MUPPET.modular.function <- function(
                 if(nrow(table.to.write) >0){
                   file.name <- paste0(fragments[[which.fragment]]$name, " unstandardized loadings summary statistics.docx")
                   # tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
-                  temp.table.tt <- tt(table.to.write)
-                  save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
+                  temp.table.tt <- tinytable::tt(table.to.write)
+                  tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
 
                 }
 
