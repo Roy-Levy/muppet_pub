@@ -1,7 +1,7 @@
 Package: muppet
 Type: Package
 Title: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling
-Version: 0.1.1
+Version: 0.1.2
 Authors@R:
   person(given = "Roy",
          family = "Levy",
