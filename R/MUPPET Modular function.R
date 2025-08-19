@@ -611,13 +611,26 @@ MUPPET.modular.function <- function(
 
               }
 
+              sink("Checkpoint.out", append = TRUE)
+              print("Checkpoint 1")
+              sink()
 
               # * * unstandardized solution -----
               if(1==1){
-                working.table <- working.table.all.parameters %>%
+
+                sink("Checkpoint.out", append = TRUE)
+                print("Checkpoint 2")
+                sink()
+
+                  working.table <- working.table.all.parameters %>%
                   filter(
                     !grepl("STD", Parameter, ignore.case = TRUE)
                   )
+
+
+                  sink("Checkpoint.out", append = TRUE)
+                  print("Checkpoint 3")
+                  sink()
 
                 # * * Remove text before a character from the parameter names -----
                 working.table$Parameter <- remove_prefix_function(
@@ -625,12 +638,19 @@ MUPPET.modular.function <- function(
                   delimiter = "_" # will remove text before (and including) the first instance of this character
                 )
 
+                  sink("Checkpoint.out", append = TRUE)
+                  print("Checkpoint 4")
+                  sink()
 
                 # * * * loadings -----
                 loadings.table <- working.table %>%
                   filter(
                     grepl("\\.BY\\.", Parameter, ignore.case = TRUE)
                   )
+
+                  sink("Checkpoint.out", append = TRUE)
+                  print("Checkpoint 5")
+                  sink()
 
                 # Write out the table
                 table.to.write <- loadings.table
@@ -928,6 +948,8 @@ MUPPET.modular.function <- function(
 
               } # closes switch for STDYX solution
             } # closes if saving summary statistics in Word
+
+
 
 
             # * * * Write out the summary plots for the MUPPET model ------
