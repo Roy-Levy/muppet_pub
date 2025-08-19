@@ -14,6 +14,12 @@
 #' @import readr
 #' @import tibble
 #' @import rlang
+
+.onLoad <- function(libname, pkgname) {
+# Ensure rlang is loaded when your package loads, b/c otherwise tinytable won't access it properly to write out tables
+library(rlang)
+}
+
 #' @import tidyverse
 #'
 #' @importFrom Hmisc capitalize
@@ -656,14 +662,14 @@ MUPPET.modular.function <- function(
                 if(nrow(table.to.write) >0){
                   file.name <- paste0(fragments[[which.fragment]]$name, " unstandardized loadings summary statistics.docx")
 
-                  # tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
+                  tt(table.to.write) |> save_tt(paste0(file.name), overwrite=TRUE)
 
-                  temp.table.tt <- tinytable::tt(table.to.write)
+                  # temp.table.tt <- tinytable::tt(table.to.write)
 
-                  print(paste0("Attempting to save to: ", file.name))
+                  # print(paste0("Attempting to save to: ", file.name))
 
-                  # tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
-                  tinytable::save_tt(temp.table.tt, "test.docx", overwrite=TRUE)
+                   # tinytable::save_tt(temp.table.tt, paste0(file.name), overwrite=TRUE)
+                  # tinytable::save_tt(temp.table.tt, "test.docx", overwrite=TRUE)
 
                 }
 
