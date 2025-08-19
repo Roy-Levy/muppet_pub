@@ -13,7 +13,7 @@
 #' @import tinytable
 #' @import readr
 #' @import tibble
-#' @import rlang
+#' @importFrom rlang %||%
 #' @import tidyverse
 #'
 #' @importFrom Hmisc capitalize
@@ -654,7 +654,7 @@ MUPPET.modular.function <- function(
                 }
 
                 sink("Checkpoint.out", append = TRUE)
-                print("Checkpoint 7")
+                print("Checkpoint 8")
                 sink()
 
                 # * * * intercepts and means -----
