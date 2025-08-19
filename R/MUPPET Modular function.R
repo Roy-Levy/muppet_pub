@@ -11,6 +11,9 @@
 #' @import stringr
 #' @import MplusAutomation
 #' @import tinytable
+#' @import readr
+#' @import tibble
+#'
 #' @importFrom Hmisc capitalize
 #'
 #' @title MUPPET Analysis
