@@ -14,6 +14,7 @@
 #' @import readr
 #' @import tibble
 #' @import rlang
+#' @import tidyverse
 #'
 #' @importFrom Hmisc capitalize
 #'
