@@ -186,13 +186,6 @@ MUPPET.modular.function <- function(
 ){
 
 
-  # To delete
-
-  # # Define the operator from rlang that tinytable seems to have trouble importing -----
-  # `%||%` <- function(x, y) if (is.null(x)) y else x
-
-
-
 
   # Sink out file with some session info -----
       sink("R Session Info.out")
@@ -3195,6 +3188,9 @@ TYPE = PLOT3;
           print(paste0("Completed Fragment ", which.fragment, " batch ", which.estimation.batch, " of ", n.estimation.batches, " ", round(current.time, units="secs")))
           sink()
 
+
+          gc()  # Force garbage collection each iteration
+
         } # closes loop over estimation batches
 
 
@@ -3886,9 +3882,6 @@ TYPE = PLOT3;
 
         } # closes if the fragment is conditional on other fragments
 
-      } # closes if this fragment is to be fit
-
-
         # * Move fragment specific files to fragment folder -----
 
         # Select files with the fragment name in them
@@ -3901,6 +3894,7 @@ TYPE = PLOT3;
         file.copy(files_to_copy, file.path(fragment.folder, files_to_copy))
         rm(files_to_copy)
 
+      } # closes if this fragment is to be fit
 
         # * End the timer -------
         end.time <- Sys.time()
