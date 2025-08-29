@@ -110,10 +110,7 @@ factor analytic measurement model. In this specification, the latent
 variable mean and variance are fixed, and all the loadings are
 estimated.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># * Fragment 1----</span></span>
-<span><span class="co"># * * Model syntax  ----</span></span>
-<span></span>
-<span><span class="va">Mplus.MODEL.syntax.fragment.1</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
+<code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.1</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
 <span><span class="st"> ! Factor Model</span></span>
 <span><span class="st"> F1 by x1-x4*;</span></span>
 <span><span class="st"> [x1-x4];</span></span>
@@ -127,8 +124,7 @@ estimated.</p>
 <p>Now define the specifications for the fragment. In this list we are
 passing along the syntax and data from above.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># * * Fragment specifications -----</span></span>
-<span><span class="va">fragment.1.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">fragment.1.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Measurement Model"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.1</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -143,18 +139,16 @@ passing along the syntax and data from above.</p>
 </h2>
 <p>The key specification for Fragment 2 in the Mplus syntax is the
 structural portion. Note that the syntax also includes the
-specifications fixing the latent variable mean and variance are fixed.
-These were included in Fragment 1 as well, but also need to be here to
-preserve this constraint. In effect, the function will bring in the
-results for the <em>fitted</em> parameters from Fragment 1. But the
-latent variable mean and variance were not fitted parameters in Fragment
-1. They were fixed in Fragment 1. So they will not be “brought forward”
-by looking at the fitted results from Fragment 1. So they need to be
-specified here as well.</p>
+specifications fixing the latent variable mean and variance. These were
+included in Fragment 1 as well, but also need to be here to preserve
+this constraint. In effect, the function will bring in the results for
+the <em>fitted</em> parameters from Fragment 1. But the latent variable
+mean and variance were not fitted parameters in Fragment 1. They were
+fixed in Fragment 1. So they will not be “brought forward” by looking at
+the fitted results from Fragment 1. So they need to be specified here as
+well.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># * Fragment 2 ----</span></span>
-<span><span class="co"># * * Model syntax  ----</span></span>
-<span><span class="va">Mplus.MODEL.syntax.fragment.2</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
+<code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.2</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
 <span><span class="st"></span></span>
 <span><span class="st">! Structural relations</span></span>
 <span><span class="st"> y1 on F1;</span></span>
@@ -174,8 +168,7 @@ passing along the syntax and data, as we did for Fragment 1. By setting
 instructing the functions to condition on the results from Fragment
 1.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># * * Fragment specifications -----</span></span>
-<span><span class="va">fragment.2.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">fragment.2.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Structural Model With an Outcome"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.2</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -191,16 +184,11 @@ instructing the functions to condition on the results from Fragment
 <div class="section level2">
 <h2 id="conduct-muppet-modeling">Conduct MUPPET modeling<a class="anchor" aria-label="anchor" href="#conduct-muppet-modeling"></a>
 </h2>
-<p>The key specification for Fragment 2 in the Mplus syntax is the
-structural portion. Note that the syntax also includes the
-specifications fixing the latent variable mean and variance are fixed.
-These were included in Fragment 1 as well, but also need to be here to
-preserve this constraint. In effect, the function will bring in the
-results for the <em>fitted</em> parameters from Fragment 1. But the
-latent variable mean and variance were not fitted parameters in Fragment
-1. They were fixed in Fragment 1. So they will not be “brought forward”
-by looking at the fitted results from Fragment 1. So they need to be
-specified here as well.</p>
+<p>The code below demonstrates conducting MUPPET modeling. The
+<code>fragments</code> argument contains the specifications for the
+model fragments defined above. The rest of the arguments communicate
+specifications for running MCMC and saving output. Running this code
+will write out output files.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MUPPET.modular.function.html">MUPPET.modular.function</a></span><span class="op">(</span></span>
 <span>  n.chains <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -209,47 +197,12 @@ specified here as well.</p>
 <span>  n.iters.per.chain.after.warmup.and.burnin <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n.estimation.batches <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  convergence.assessment <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span></span>
 <span>  save.summary.stats.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  save.summary.stats.from.MUPPET.in.Word<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>  digits.to.round.for.Word <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  save.summary.plots.from.MUPPET <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span></span>
 <span>  save.draws.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>  fragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fragment.1.specs</span>, <span class="va">fragment.2.specs</span><span class="op">)</span>,</span>
 <span>  retain.iteration.files <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="tips-for-muppet-modeling-and-software">Tips for MUPPET Modeling and Software<a class="anchor" aria-label="anchor" href="#tips-for-muppet-modeling-and-software"></a>
-</h2>
-<div class="section level3">
-<h3 id="variable-names">Variable names<a class="anchor" aria-label="anchor" href="#variable-names"></a>
-</h3>
-<p>Owing to Mplus’s naming conventions for parameters, variable names
-should be 8 characters or fewer. For variables that are discrete
-(categorical), the length of the names should be 6 characters or fewer.
-(This holds as long as there are fewer than 10 thresholds for the
-categorical variables. If you’re using a variable with 10 or more
-thresholds, you will likely need an even shorter variable name.)</p>
-</div>
-<div class="section level3">
-<h3 id="number-of-iterations">Number of iterations<a class="anchor" aria-label="anchor" href="#number-of-iterations"></a>
-</h3>
-<p>Theoretically, any number of chains and iterations could used.
-However, early testing indicated that problems can occur if using a
-single chain, or when using fewer than 100 iterations for inference.
-More concretely, this means that <code>n.chains</code> should be at
-least 2, and <code>n.iters.per.chain.after.warmup.and.burnin</code>
-should be at least 100.</p>
-</div>
-<div class="section level3">
-<h3 id="crashing-or-exhausting-of-memory">Crashing or exhausting of memory<a class="anchor" aria-label="anchor" href="#crashing-or-exhausting-of-memory"></a>
-</h3>
-<p>If experience crashes or other issues related to exhausting computer
-memory, it can help to increase the
-<code>n.estimation.batches</code>.</p>
-</div>
 </div>
   </div>
 
