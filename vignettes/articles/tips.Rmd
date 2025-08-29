@@ -1,0 +1,17 @@
+---
+title: "Tips for Using the Software to conduct MUPPET Modeling"
+output: html_document
+date: "2025-08-28"
+---
+
+## Tips for MUPPET Modeling and Software
+
+### Variable names
+Owing to Mplus's naming conventions for parameters, variable names should be 8 characters or fewer. For variables that are discrete (categorical), the length of the names should be 6 characters or fewer. (This holds as long as there are fewer than 10 thresholds for the categorical variables. If you're using a variable with 10 or more thresholds, you will likely need an even shorter variable name.)
+
+### Number of iterations
+Theoretically, any number of chains and iterations could used. However, early testing indicated that problems can occur if using a single chain, or when using fewer than 100 iterations for inference. More concretely, this means that `n.chains` should be at least 2, and `n.iters.per.chain.after.warmup.and.burnin` should be at least 100. 
+
+### Crashing or exhausting of memory
+If experience crashes or other issues related to exhausting computer memory, it can help to increase the value of `n.estimation.batches`.
+

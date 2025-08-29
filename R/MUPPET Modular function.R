@@ -28,6 +28,58 @@ library(rlang)
 #'
 #' @description  Conducts modular MUPPET modeling.
 #'
+#' @param fragments A list with elements defining the model fragments. Each
+#'   element in this list contains a set of specifications for the corresponding
+#'   fragment. The 1st element in this list pertains to the 1st fragment, the
+#'   2nd element in this list pertains to the 2nd fragment, and so on. The order
+#'   of the list also communicates the order each model fragment will be fit. Each element of this list is itself a list with specifications for the fragment. Each set of specifications can include:
+#'  \itemize{
+  #'  \item{name: Character, giving a name to the fragment. No default. If nothing is supplied, the fragment name will be the fragment number.}
+  #'  \item{fragment.folder: Character, giving the name of the folder to be created storing the results for the fragment. If no value is supplied, will default to a name made up of the fragment number and fragment name.}
+  #'  \item{model.syntax: Character, containing syntax for the Mplus MODEL statement.}
+  #'  \item{variable.syntax: Character, containing syntax for the Mplus VARIABLE statement.}
+  #'  \item{priors.syntax: Character, expression containing Mplus syntax for the prior specifications for the model in this fragment, corresponding to the Mplus MODELPRIORS statement. If nothing is specified, defaults to using Mplus's default priors.}
+  #'  \item{conditioning: Number, or vector of numbers, indicating which fragments
+  #'  to condition on when fitting this fragment. Examples: a value of 0 indicates
+  #'  the fragment is unconditional; a value of 1 indicates the fragment is
+  #'  conditional on the first fragment in the fragments list; a value of c(1, 2)
+  #'  indicates the fragment is conditional on fragment 1 and fragment 2 in the
+  #'  fragments list.}
+#'  \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for pkg{conditioning}).
+#'  Each element of the list is a character, or character vector, naming the kinds of parameters from the associated antecedent fragment that should be ignored in fitting this fragment.
+#'  Possible values are:
+#'
+#'  \itemize{
+#'    \item "none"
+#'    \item "loadings"
+#'    \item "(co)variances of observables"
+#'    \item "means and intercepts of observables"
+#'    \item "thresholds"
+#'    \item "structural coefficients"
+#'    \item "(co)variances of latent variables"
+#'    \item "means and intercepts of latent variables"
+#'  }
+#'  A value of "none" indicates that all fitted parameters from the antecedent
+#'  fragment should be conditioned on. For example, if pkg{conditioning} = c(1,2),
+#'  and pkg{parameters.to.exclude.in.conditioning} = list("none", c("(co)variances of
+#'  latent variables", "means and intercepts of latent variables")),then none of
+#'  the parameters from fragment 1 will be ignored, while there will be
+#'  parameters from fragment 2 that are ignored. These parameters include the
+#'  (co)variances of latent variables and the means and intercepts of latent
+#'  variables.
+
+#'
+#'  If no value for pkg{parameters.to.exclude.in.conditioning}is supplied, the default is "none" for all antecedent fragments.
+#'  }
+#'
+#'  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
+#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.}
+#'  \item{data: The dataset to use in fitting this fragment.}
+
+
+#'}
+#'
+
 #' @param n.chains The number of Markov chains to run in each unconditional fragment. Default is 2.
 
 #' @param n.warmup The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..
@@ -76,63 +128,6 @@ library(rlang)
 #'   for limited classes of models. It is not currently, but is planned for future
 #'   development.
 
-#' @param fragments A list with elements defining the model fragments. Each
-#'   element in this list contains a set of specifications for the corresponding
-#'   fragment. The 1st element in this list pertains to the 1st fragment, the
-#'   2nd element in this list pertains to the 2nd fragment, and so on. The order
-#'   of the list also communicates the order each model fragment will be fit. Each element of this list is itself a list with specifications for the fragment. Each set of specifications can include:
-#'  \itemize{
-  #'  \item{name: Character, giving a name to the fragment. No default. If nothing is supplied, the fragment name will be the fragment number.}
-  #'  \item{fragment.folder: Character, giving the name of the folder to be created storing the results for the fragment. If no value is supplied, will default to a name made up of the fragment number and fragment name.}
-  #'  \item{model.syntax: Character, containing syntax for the Mplus MODEL statement.}
-  #'  \item{variable.syntax: Character, containing syntax for the Mplus VARIABLE statement.}
-  #'  \item{priors.syntax: Character, expression containing Mplus syntax for the prior specifications for the model in this fragment, corresponding to the Mplus MODELPRIORS statement. If nothing is specified, defaults to using Mplus's default priors.}
-  #'  \item{conditioning: Number, or vector of numbers, indicating which fragments
-  #'  to condition on when fitting this fragment. Examples: a value of 0 indicates
-  #'  the fragment is unconditional; a value of 1 indicates the fragment is
-  #'  conditional on the first fragment in the fragments list; a value of c(1, 2)
-  #'  indicates the fragment is conditional on fragment 1 and fragment 2 in the
-  #'  fragments list.}
-#'  \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for pkg{conditioning}).
-#'  Each element of the list is a character, or character vector, naming the kinds of parameters from the associated antecedent fragment that should be ignored in fitting this fragment.
-#'  Possible values are:
-#'
-#'  \itemize{
-#'    \item "none"
-#'    \item "loadings"
-#'    \item "(co)variances of observables"
-#'    \item "means and intercepts of observables"
-#'    \item "thresholds"
-#'    \item "structural coefficients"
-#'    \item "(co)variances of latent variables"
-#'    \item "means and intercepts of latent variables"
-#'  }
-#'  A value of "none" indicates that all fitted parameters from the antecedent
-#'  fragment should be conditioned on. For example, if pkg{conditioning} = c(1,2),
-#'  and pkg{parameters.to.exclude.in.conditioning} = list("none", c("(co)variances of
-#'  latent variables", "means and intercepts of latent variables")),then none of
-#'  the parameters from fragment 1 will be ignored, while there will be
-#'  parameters from fragment 2 that are ignored. These parameters include the
-#'  (co)variances of latent variables and the means and intercepts of latent
-#'  variables.
-
-#'
-#'  If no value for pkg{parameters.to.exclude.in.conditioning}is not supplied, the default is "none" for all antecedent fragments.
-#'  }
-#'
-#'  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
-#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE.}
-#'  \item{data: The dataset to use in fitting this fragment.}
-
-
-#'}
-#'
-
-
-
-
-
-
 #' @param retain.iteration.files Logical. For conditional fragments, should the iteration-specific files be saved? Saving all these files may take up a lot of space. If set to FALSE, will still save the files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.
 
 #' @param return.R.object Logical, indicating whether to return results as an R object. Default is FALSE. This was supported in earlier versions for a limited class of models. This is not current, and should not be set to TRUE. For future development.
@@ -145,6 +140,7 @@ library(rlang)
 MUPPET.modular.function <- function(
     # software.environment = "Mplus", # Currently supporting Mplus, others in development
 
+    fragments = NULL,
     n.chains = 2,
     n.warmup = 0,
     n.burnin = 500, # For Mplus, thin applies to all iterations. This burn-in is how many of the *thinned* iterations to burn in. So number actually burned in is (n.warmup*n.thin)
@@ -177,8 +173,6 @@ MUPPET.modular.function <- function(
     save.draws.from.MUPPET=TRUE,
     model.check=FALSE, # Supported in earlier versions, not current, for future development
     save.post.pred.data=FALSE, # Supported in earlier versions, not current, for future development
-
-    fragments = NULL,
 
     retain.iteration.files = FALSE,     # should we retain all the iteration specific files from Mplus
 
@@ -237,19 +231,27 @@ MUPPET.modular.function <- function(
       } # closes setting default if convergence assessment argument not supplied
 
 
+      # For each fragment, set defaults if no value is supplied for the fragment
 
+      # to.fit
       if(is.null(fragments[[which.fragment]]$to.fit)){
         fragments[[which.fragment]]$to.fit = TRUE
       } #closes if to.fit is not supplied
 
+      # name
       if(is.null(fragments[[which.fragment]]$name)){
         fragments[[which.fragment]]$name = paste0("Fragment ", which.fragment)
       } #closes if name is not supplied
 
+      # fragment.folder
       if(is.null(fragments[[which.fragment]]$fragment.folder)){
         fragments[[which.fragment]]$fragment.folder = paste0(home.folder, "/Fragment ", which.fragment, " ", fragments[[which.fragment]]$name, "/")
       } #closes if fragment folder name is not supplied
 
+      # estimating.lvs
+      if(is.null(fragments[[which.fragment]]$estimating.lvs)){
+        fragments[[which.fragment]]$estimating.lvs = FALSE
+      } #closes if argument for whether estimating latent variables is not supplied
 
 
     } # closes loop over fragments from the supplied list
@@ -1514,7 +1516,6 @@ MUPPET.modular.function <- function(
             # Keep only distinct rows
             distinct.data <- distinct(fragments[[which.fragment]]$data)
           } # closes if estimating LVs in this fragment
-
 
 
 
