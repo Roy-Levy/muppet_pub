@@ -119,6 +119,5 @@ MUPPET.modular.function(
   save.summary.plots.from.MUPPET = "unstandardized",
   save.draws.from.MUPPET=TRUE,
   fragments = list(fragment.1.specs, fragment.2.specs),
-  retain.iteration.files = FALSE
 )
 ```

@@ -113,7 +113,7 @@ development.}
  (co)variances of latent variables and the means and intercepts of latent
  variables.
 
- If no value for pkg{parameters.to.exclude.in.conditioning}is not supplied, the default is "none" for all antecedent fragments.
+ If no value for pkg{parameters.to.exclude.in.conditioning}is supplied, the default is "none" for all antecedent fragments.
  }
 
  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
