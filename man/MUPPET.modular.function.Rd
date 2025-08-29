@@ -5,6 +5,7 @@
 \title{MUPPET Analysis}
 \usage{
 MUPPET.modular.function(
+  fragments = NULL,
   n.chains = 2,
   n.warmup = 0,
   n.burnin = 500,
@@ -19,60 +20,11 @@ MUPPET.modular.function(
   save.draws.from.MUPPET = TRUE,
   model.check = FALSE,
   save.post.pred.data = FALSE,
-  fragments = NULL,
   retain.iteration.files = FALSE,
   return.R.object = FALSE
 )
 }
 \arguments{
-\item{n.chains}{The number of Markov chains to run in each unconditional fragment. Default is 2.}
-
-\item{n.warmup}{The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..}
-
-\item{n.burnin}{The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument n.thin. Default is 500.}
-
-\item{n.iters.per.chain.after.warmup.and.burnin}{The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument n.thin. Default is 2500.}
-
-\item{n.thin}{The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose n.burnin = 500,  n.iters.per.chain.after.warmup.and.burnin = 2500, and n.thin = 2. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.}
-
-\item{n.estimation.batches}{The number of estimation batches when fitting
-fragments that are conditional on antecedent fragments. Default is NULL, in
-which case the function will divide the total number post burn-in
-iterations by 1000, effectively doing batches of 1000 iterations at a time.
-Using more estimation batches leads to fewer iterations per estimation
-batch. This can be helpful for reducing computational burden and run time,
-and also offers future possibilities for checkpointing.}
-
-\item{convergence.assessment}{Character, indicating if convergence assessment
-is desired for fragments that are not conditional on antecedents. Options
-are: "unstandardized" to only plot
-unstandardized parameters, "all" to plot standardized and unstandardized
-parameters, "none" for turning off convergence assessment. This argument is
-irrelevant for fragments that are conditional on antecedent fragments. Default is "unstandardized".}
-
-\item{save.summary.stats.from.MUPPET}{Logical, indicating if numerical
-summaries of posterior distributions be saved. Default is TRUE.}
-
-\item{save.summary.stats.from.MUPPET.in.Word}{Logical, indicating if slimmed
-down numerical summary statistics of the posterior distributions should be
-saved as Word documents. Default is FALSE.}
-
-\item{digits.to.round.for.Word}{Numerical. Digits to round if saving results in Word documents. Only relevant if save.summary.stats.from.MUPPET.in.Word = TRUE. Default = 2.}
-
-\item{save.summary.plots.from.MUPPET}{Character, indicating if summary plots of the posterior should be saved. Options
-are: "unstandardized" to only plot
-unstandardized parameters, "all" to plot standardized and unstandardized
-parameters, "none" for turning off these plots. Default is "unstandardized".}
-
-\item{save.draws.from.MUPPET}{Logical, indicating whether the draws from fitting the MUPPET model should be written out as an output file. Default is TRUE.}
-
-\item{model.check}{Logical, indicating if model-data fit should be conducted. Default is FALSE. This feature was supported in earlier versions for limited classes of models. It is not currently, but is planned for future development.}
-
-\item{save.post.pred.data}{Logical, indicating if posterior predicted datasets from the model-data fit procedure should be
-saved Default is FALSE. This feature was supported in earlier versions
-for limited classes of models. It is not currently, but is planned for future
-development.}
-
 \item{fragments}{A list with elements defining the model fragments. Each
   element in this list contains a set of specifications for the corresponding
   fragment. The 1st element in this list pertains to the 1st fragment, the
@@ -120,6 +72,54 @@ development.}
  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.}
  \item{data: The dataset to use in fitting this fragment.}
 }}
+
+\item{n.chains}{The number of Markov chains to run in each unconditional fragment. Default is 2.}
+
+\item{n.warmup}{The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..}
+
+\item{n.burnin}{The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument n.thin. Default is 500.}
+
+\item{n.iters.per.chain.after.warmup.and.burnin}{The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument n.thin. Default is 2500.}
+
+\item{n.thin}{The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose n.burnin = 500,  n.iters.per.chain.after.warmup.and.burnin = 2500, and n.thin = 2. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.}
+
+\item{n.estimation.batches}{The number of estimation batches when fitting
+fragments that are conditional on antecedent fragments. Default is NULL, in
+which case the function will divide the total number post burn-in
+iterations by 1000, effectively doing batches of 1000 iterations at a time.
+Using more estimation batches leads to fewer iterations per estimation
+batch. This can be helpful for reducing computational burden and run time,
+and also offers future possibilities for checkpointing.}
+
+\item{convergence.assessment}{Character, indicating if convergence assessment
+is desired for fragments that are not conditional on antecedents. Options
+are: "unstandardized" to only plot
+unstandardized parameters, "all" to plot standardized and unstandardized
+parameters, "none" for turning off convergence assessment. This argument is
+irrelevant for fragments that are conditional on antecedent fragments. Default is "unstandardized".}
+
+\item{save.summary.stats.from.MUPPET}{Logical, indicating if numerical
+summaries of posterior distributions be saved. Default is TRUE.}
+
+\item{save.summary.stats.from.MUPPET.in.Word}{Logical, indicating if slimmed
+down numerical summary statistics of the posterior distributions should be
+saved as Word documents. Default is FALSE.}
+
+\item{digits.to.round.for.Word}{Numerical. Digits to round if saving results in Word documents. Only relevant if save.summary.stats.from.MUPPET.in.Word = TRUE. Default = 2.}
+
+\item{save.summary.plots.from.MUPPET}{Character, indicating if summary plots of the posterior should be saved. Options
+are: "unstandardized" to only plot
+unstandardized parameters, "all" to plot standardized and unstandardized
+parameters, "none" for turning off these plots. Default is "unstandardized".}
+
+\item{save.draws.from.MUPPET}{Logical, indicating whether the draws from fitting the MUPPET model should be written out as an output file. Default is TRUE.}
+
+\item{model.check}{Logical, indicating if model-data fit should be conducted. Default is FALSE. This feature was supported in earlier versions for limited classes of models. It is not currently, but is planned for future development.}
+
+\item{save.post.pred.data}{Logical, indicating if posterior predicted datasets from the model-data fit procedure should be
+saved Default is FALSE. This feature was supported in earlier versions
+for limited classes of models. It is not currently, but is planned for future
+development.}
 
 \item{retain.iteration.files}{Logical. For conditional fragments, should the iteration-specific files be saved? Saving all these files may take up a lot of space. If set to FALSE, will still save the files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.}
 

@@ -109,15 +109,13 @@ The code below demonstrates conducting MUPPET modeling. The `fragments` argument
 
 ```{r conduct-MUPPET-modeling, eval = FALSE}
 MUPPET.modular.function(
+  fragments = list(fragment.1.specs, fragment.2.specs),
   n.chains = 2,
   n.warmup = 0,
   n.burnin = 500,
   n.iters.per.chain.after.warmup.and.burnin = 100,
   n.estimation.batches = 25,
-  convergence.assessment = "unstandardized",
-  save.summary.stats.from.MUPPET=TRUE,
-  save.summary.plots.from.MUPPET = "unstandardized",
-  save.draws.from.MUPPET=TRUE,
-  fragments = list(fragment.1.specs, fragment.2.specs),
+  convergence.assessment = "none",
+  save.summary.plots.from.MUPPET = "none"
 )
 ```
