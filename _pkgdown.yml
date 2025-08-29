@@ -1,0 +1,22 @@
+url: https://roy-levy.github.io/muppet_pub/
+
+navbar:
+  structure:
+    left: [intro, reference, examples, tips]
+    right: [search, github]
+  components:
+    reference:
+      text: Functions
+      href: reference/index.html
+    examples:
+      text: Examples and Tips
+      href: articles/index.html
+
+articles:
+- title: "Examples and Tips"
+  contents:
+  - articles/tips
+  - articles/example_1
+  - articles/example_2
+
+

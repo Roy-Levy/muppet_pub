@@ -117,7 +117,7 @@ library(rlang)
 #'  variables.
 
 #'
-#'  If no value for pkg{parameters.to.exclude.in.conditioning}is not supplied, the default is "none" for all antecedent fragments.
+#'  If no value for pkg{parameters.to.exclude.in.conditioning}is supplied, the default is "none" for all antecedent fragments.
 #'  }
 #'
 #'  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
@@ -237,19 +237,27 @@ MUPPET.modular.function <- function(
       } # closes setting default if convergence assessment argument not supplied
 
 
+      # For each fragment, set defaults if no value is supplied for the fragment
 
+      # to.fit
       if(is.null(fragments[[which.fragment]]$to.fit)){
         fragments[[which.fragment]]$to.fit = TRUE
       } #closes if to.fit is not supplied
 
+      # name
       if(is.null(fragments[[which.fragment]]$name)){
         fragments[[which.fragment]]$name = paste0("Fragment ", which.fragment)
       } #closes if name is not supplied
 
+      # fragment.folder
       if(is.null(fragments[[which.fragment]]$fragment.folder)){
         fragments[[which.fragment]]$fragment.folder = paste0(home.folder, "/Fragment ", which.fragment, " ", fragments[[which.fragment]]$name, "/")
       } #closes if fragment folder name is not supplied
 
+      # estimating.lvs
+      if(is.null(fragments[[which.fragment]]$estimating.lvs)){
+        fragments[[which.fragment]]$estimating.lvs = FALSE
+      } #closes if argument for whether estimating latent variables is not supplied
 
 
     } # closes loop over fragments from the supplied list
@@ -1514,7 +1522,6 @@ MUPPET.modular.function <- function(
             # Keep only distinct rows
             distinct.data <- distinct(fragments[[which.fragment]]$data)
           } # closes if estimating LVs in this fragment
-
 
 
 

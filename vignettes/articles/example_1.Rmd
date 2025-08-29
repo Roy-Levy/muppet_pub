@@ -1,0 +1,124 @@
+---
+title: "SEM with 1 Latent Variable and 1 Outcome, in 2 Fragments"
+output: html_document
+date: "2025-08-22"
+---
+
+## Introduction
+
+This example demonstrates how to use the muppet() package to perform MUPPET modeling for a structural equation modeling (SEM) example. This example has one latent variable with indicators and an outcome. The model consists of 2 fragments. Fragment 1 is the factor analytic measurement model for the indicators. Fragment 2 is a structural model relating the latent variable to the outcome. 
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+## Data Prepration
+
+Load the package and extract the data for this example. 
+
+```{r data-read-in, eval = FALSE}
+library(muppet)
+data(one.factor.interpr.confound, package = "muppet")
+data.for.mplus <- one.factor.interpr.confound.data
+```
+
+Look through the data and check if any of the column names have more than 8 characters. Owing to Mplus's naming conventions for parameters, variable names should be 8 characters or fewer. For variables that are discrete (categorical), the length of the names should be 6 characters or fewer. (This holds as long as there are fewer than 10 thresholds for the categorical variables. If you're using a variable with 10 or more thresholds, you will likely need an even shorter variable name.)
+
+
+```{r data-check, eval = FALSE}
+# * Check if any column names are more than 8 characters
+if(!all(nchar(colnames(data.for.mplus)) <= 8)){
+  print("Do not proceed. Rename Mplus variables to have <= 8 characters")
+  print("See Permissive Norms Example R file for code on renaming variables")
+}
+```
+
+
+## Specify Fragment 1
+
+The key specification for Fragment 1 is the Mplus syntax for the factor analytic measurement model. In this specification, the latent variable mean and variance are fixed, and all the loadings and intercepts are estimated. 
+
+
+```{r fragment-1-model-syntax, eval = FALSE}
+Mplus.MODEL.syntax.fragment.1 <- "
+ ! Factor Model
+ F1 by x1-x4*;
+ [x1-x4];
+
+ ! Factor Variances
+ F1@1;
+
+ ! Factor Means
+ [F1@0];
+"
+```
+
+
+Now define the specifications for the fragment. In this list we are passing along the syntax and data from above. By setting `conditioning = 0` in this list of specifications, we are fitting this fragment without conditioning on any other fragment. 
+
+```{r fragment-1-specifications, eval = FALSE}
+fragment.1.specs <- list(
+  name = "Measurement Model",
+  model.syntax = Mplus.MODEL.syntax.fragment.1,
+  conditioning = 0,
+  data = data.for.mplus
+)
+```
+
+
+
+## Specify Fragment 2
+
+The key specification for Fragment 2 in the Mplus syntax is the structural portion. Note that the syntax also includes the specifications fixing the latent variable mean and variance. These were included in Fragment 1 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 1. But the latent variable mean and variance were not fitted parameters in Fragment 1. They were fixed in Fragment 1. So they will not be "brought forward" by looking at the fitted results from Fragment 1. So they need to be specified here as well. 
+
+
+```{r fragment-2-model-syntax, eval = FALSE}
+Mplus.MODEL.syntax.fragment.2 <- "
+
+! Structural relations
+ y1 on F1;
+
+! Structural intercepts
+[y1];
+
+ ! Factor Variances
+ F1@1;
+
+ ! Factor Means
+ [F1@0];
+"
+```
+
+Now define the specifications for the fragment. In this list we are passing along the syntax and data, as we did for Fragment 1. By setting `conditioning = 1` in this list of specifications, we are instructing the functions to condition on the results from Fragment 1. 
+
+```{r fragment-2-specifications, eval = FALSE}
+fragment.2.specs <- list(
+  name = "Structural Model With an Outcome",
+  model.syntax = Mplus.MODEL.syntax.fragment.2,
+  conditioning = 1,
+  data = data.for.mplus
+)
+```
+
+## Conduct MUPPET modeling
+
+The code below demonstrates conducting MUPPET modeling. The `fragments` argument contains the specifications for the model fragments defined above. The rest of the arguments communicate specifications for running MCMC and saving output. Running this code will write out output files.
+
+
+```{r conduct-MUPPET-modeling, eval = FALSE}
+MUPPET.modular.function(
+  n.chains = 2,
+  n.warmup = 0,
+  n.burnin = 500,
+  n.iters.per.chain.after.warmup.and.burnin = 100,
+  n.estimation.batches = 25,
+  convergence.assessment = "unstandardized",
+  save.summary.stats.from.MUPPET=TRUE,
+  save.summary.plots.from.MUPPET = "unstandardized",
+  save.draws.from.MUPPET=TRUE,
+  fragments = list(fragment.1.specs, fragment.2.specs),
+  retain.iteration.files = FALSE
+)
+```
