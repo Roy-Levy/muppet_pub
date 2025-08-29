@@ -4,7 +4,7 @@ output: html_document
 date: "2025-08-22"
 ---
 
-## Introduction
+## Overview
 
 This example demonstrates how to use the muppet() package to perform MUPPET modeling for a structural equation modeling (SEM) example. This example has one latent variable with indicators and an outcome. The model consists of 2 fragments. Fragment 1 is the factor analytic measurement model for the indicators. Fragment 2 is a structural model relating the latent variable to the outcome. 
 
