@@ -71,7 +71,7 @@ Out-Of-Sample Scoring, in 3 Fragments</h1>
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>This example demonstrates how to use the muppet() package to perform
 MUPPET modeling for an item response theory (IRT) example. The example
@@ -91,7 +91,7 @@ conduct out-of-sample scoring).</p>
 </h2>
 <p>Load the package and extract the data for this example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">muppet</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roy-levy.github.io/muppet_pub/">muppet</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim.IRT</span>, package <span class="op">=</span> <span class="st">"muppet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -119,185 +119,128 @@ R object with the desired text for the Mplus input file.</p>
 <span><span class="st">    ;</span></span>
 <span><span class="st">  "</span></span></code></pre></div>
 <p>Now define the specifications for the fragment. In this list we are
-passing along the syntax and data from above.</p>
+passing along the syntax from above. By setting
+<code>conditioning = 0</code> in this list of specifications, we are
+fitting this fragment without conditioning on any other fragment. The
+data argument selects the relevant item responses from the raw dataset,
+namely those from Sample A responding to items 1-10.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fragment.1.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"Working Memory Measurement Model"</span>,</span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fragment.1.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span> <span class="st">"Sample A Items 1-10 Calibration"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.1</span>,</span>
+<span>  variable.syntax <span class="op">=</span> <span class="va">Mplus.VARIABLE.syntax.fragment.1</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
+<span>  data <span class="op">=</span>   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
+<span>    <span class="va">sim.IRT.data.sample.A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"ID"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">sim.IRT.data.sample.A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">num_range</a></span><span class="op">(</span><span class="st">"It"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="specify-fragment-2">Specify Fragment 2<a class="anchor" aria-label="anchor" href="#specify-fragment-2"></a>
 </h2>
-<p>Fragment 2 is a factor analytic measurement model, similar to
-Fragment 1. Here again, the key specification is the Mplus syntax for
-the factor analytic measurement model, where as above, the means and
-variances for the (2) latent variables are fixed, and the loadings are
-estimated.</p>
+<p>In Fragment 2 we wish to estimate the latent variables for the
+examinees from Fragment 1. So our model is the same as it was in
+Fragment 1. The model syntax just includes the model specifications for
+the latent variable mean and variance. These were included in Fragment 1
+as well, but also need to be here to preserve this constraint. In
+effect, the function will bring in the results for the <em>fitted</em>
+parameters from Fragment 1. But the latent variable mean and variance
+were not fitted parameters in Fragment 1. They were fixed in Fragment 1.
+So they will not be “brought forward” by looking at the fitted results
+from Fragment 1. So they need to be specified here as well.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.2</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
-<span><span class="st">    ! Word Learning Factor Model</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Phonological</span></span>
-<span><span class="st">  PHON BY</span></span>
-<span><span class="st">  ICPVL1gm* ICPVL2gm DIPVL1gm DIPVL2gm</span></span>
-<span><span class="st">  SIPVL1gm SIPVL2gm LTPVL1gm LTPVL2gm ICNT2P ICNT1P</span></span>
-<span><span class="st">  DINT1P DINT2P PINTGM</span></span>
-<span><span class="st">  PIPVLgm;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Semantic</span></span>
-<span><span class="st">  SEM BY ICVDD2ap* SIVDD1ap SIVDD2ap PIVDD0ap PIVFRgmp</span></span>
-<span><span class="st">  ICVDD1ap SIVFR1gm SIVFR2gm LTVFR1gm LTVFR2gm;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Variances</span></span>
-<span><span class="st">  PHON@1;</span></span>
-<span><span class="st">  SEM@1;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Correlations</span></span>
-<span><span class="st">  PHON WITH SEM;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Means</span></span>
-<span><span class="st">  [PHON@0];</span></span>
-<span><span class="st">  [SEM@0];</span></span>
-<span><span class="st">  "</span></span></code></pre></div>
-<p>Now define the specifications for the fragment. In this list we are
-passing along the syntax and data from above. Note that even though this
-is Fragment 2, it is not conditional on Fragment 1. This is expressed by
-the argument that <code>conditioning = 0</code>.</p>
+<span><span class="st">  F1@1;</span></span>
+<span><span class="st">  [F1@0];</span></span>
+<span><span class="st">"</span></span></code></pre></div>
+<p>As in Fragment 1, we need to communicate that the observed variables
+are discrete (categorical). To do so, we can simply define an R object
+with the desired text for the Mplus input file as being just as it was
+in Fragment 1.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fragment.2.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"Word Learning Measurement Model"</span>,</span>
+<code class="sourceCode R"><span><span class="va">Mplus.VARIABLE.syntax.fragment.2</span> <span class="op">&lt;-</span> <span class="va">Mplus.VARIABLE.syntax.fragment.1</span></span></code></pre></div>
+<p>Now define the specifications for the fragment. In this list we are
+passing along the syntax from above. By setting
+<code>conditioning = 1</code> in this list of specifications, we are
+fitting this fragment conditional on Fragment 1. We declare that this
+fragment involves estimating latent variables by setting
+<code>estimating.lvs = TRUE</code>. In the next argument, we give the
+text for the names of the latent variables to be estimated. This name
+must correpond to the name in the Mplus syntax. In this case, the name
+of the latent variable in Mplus is <code>F1</code>, so we indicate that
+<code>lvs.to.estimate = c("F1")</code>. The data are the same data as in
+Fragment 1. We are using the same dataset in both fragments; here in
+Fragment 2 we are estimating the latent variables for the same examinees
+that were used in Fragment 1. That is, we are conducting in-sample
+scoring conditional on the calibration in Fragment 1.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fragment.2.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span><span class="st">"Sample A Items 1-10 Scoring"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.2</span>,</span>
-<span>  conditioning <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
+<span>  variable.syntax <span class="op">=</span> <span class="va">Mplus.VARIABLE.syntax.fragment.2</span>,</span>
+<span>  conditioning <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  estimating.lvs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  lvs.to.estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"F1"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
+<span>    <span class="va">sim.IRT.data.sample.A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"ID"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">sim.IRT.data.sample.A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">num_range</a></span><span class="op">(</span><span class="st">"It"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="specify-fragment-3">Specify Fragment 3<a class="anchor" aria-label="anchor" href="#specify-fragment-3"></a>
 </h2>
-<p>Fragment 3 is conditional on Fragment 2, and adds to it by including
-additional variables as indicators for one of the latent variables. Note
-that the syntax here also includes the specifications fixing the latent
-variable means and variances. These were included in Fragment 1 as well,
-but also need to be here to preserve this constraint. In effect, the
-function will bring in the results for the <em>fitted</em> parameters
-from Fragment 2. But the latent variable means and variances were not
-fitted parameters in Fragment 2. They were fixed in Fragment 2. So they
-will not be “brought forward” by looking at the fitted results from
-Fragment 2. So they need to be specified here as well.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.3</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
-<span><span class="st">  ! Word Learning Factor Model</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Phonological</span></span>
-<span><span class="st">  PHON BY PIMD0ap* ICMD2ap ICMD1ap DIMD1ap  DIMD2ap;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Variances</span></span>
-<span><span class="st">  PHON@1;</span></span>
-<span><span class="st">  SEM@1;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Means</span></span>
-<span><span class="st">  [PHON@0];</span></span>
-<span><span class="st">  [SEM@0];</span></span>
-<span><span class="st">  "</span></span></code></pre></div>
-<p>Now define the specifications for the fragment. In this list we are
-passing along the syntax and data, as we did for other fragments. By
-setting <code>conditioning = 2</code> in this list of specifications, we
-are instructing the functions to condition on the results from Fragment
-2.</p>
+<p>Fragment 3 is like Fragment 2 in that we wish to estimate the latent
+variables for examinees. The difference is that these examinees are not
+the same as those used in Fragment 1 (i.e., Fragment 3 pursues
+out-of-sample scoring. The model is the same as it was in Fragments 1
+and 2. Like the syntax for Fragmen 2, the model syntax here just
+includes the model specifications for the latent variable mean and
+variance. These were included in Fragment 1 as well, but as discussed
+above also need to be here to preserve this constraint.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fragment.3.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"Including More Word Learning Indicators"</span>,</span>
-<span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.3</span>,</span>
-<span>  conditioning <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="specify-fragment-4">Specify Fragment 4<a class="anchor" aria-label="anchor" href="#specify-fragment-4"></a>
-</h2>
-<p>Fragment 4 contains the structural portion relating the latent
-variables from Fragment 1 to those in Fragment 3 (which were also a part
-of Fragment 2). The latent variables from Fragment 1 are were exogenous
-in that fragment, and remain so here. Accordingly, in the Mplus syntax
-their factor means and variances are fixed, as they were in Fragment 1.
-In contrast, the latent variables from Fragment 3 were exogenous in
-Fragment 3, but are now endogenous (being predicted by the latent
-variables from Fragment 1). Accordingly, Even though their means and
-variances were fixed in Fragment 3, those parameters are now functions
-of other parameters, and we estimate intercepts and latent disturbance
-variances for those latent variables as part of the structural model.
-Note also that the correlation between the latent disturbances is part
-of the fitted model here. This is for the same reason.</p>
+<code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.3</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
+<span><span class="st">  F1@1;</span></span>
+<span><span class="st">  [F1@0];</span></span>
+<span><span class="st">"</span></span></code></pre></div>
+<p>Once again we need to communicate that the observed variables are
+discrete (categorical). To do so, we can simply define an R object with
+the desired text for the Mplus input file as being just as it was in
+Fragment 2.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Mplus.MODEL.syntax.fragment.4</span> <span class="op">&lt;-</span> <span class="st">"</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Structural relations</span></span>
-<span><span class="st">  PHON ON CE FOA PSR;</span></span>
-<span><span class="st">  SEM ON CE FOA PSR;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Structural intercepts</span></span>
-<span><span class="st">  [PHON];</span></span>
-<span><span class="st">  [SEM];</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Latent correlations (disturbances)</span></span>
-<span><span class="st">  PHON WITH SEM;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Variances</span></span>
-<span><span class="st">  CE@1;</span></span>
-<span><span class="st">  FOA@1;</span></span>
-<span><span class="st">  PSR@1;</span></span>
-<span><span class="st"></span></span>
-<span><span class="st">  ! Factor Means</span></span>
-<span><span class="st">  [CE@0];</span></span>
-<span><span class="st">  [FOA@0];</span></span>
-<span><span class="st">  [PSR@0];</span></span>
-<span><span class="st">  "</span></span></code></pre></div>
-<p>Now define the specifications for the fragment. The first key element
-here is <code>conditioning = c(1,2,3)</code>. This communicates that
-Fragment 4 is conditional on Fragments 1, 2, and 3. The next key element
-here is <code>parameters.to.exclude.in.conditioning</code>. This is a
-list with 3 entries, corresponding to the 3 fragments that we are
-conditioning on. The entries in the list express which parameters from
-that antecedent fragment to ignore (i.e., not carry forward to Fragment
-4). In this example, we want to carry forward all the fitted parameters
-from Fragment 1, so the first element in the list is <code>none</code>.
-But we do want to ignore some of the fitted parameters from Fragment 2
-and 3. In particular, we want to ignore the fitted covariances among the
-latent variables in those fragments, because those fragments are now
-endogenous, and we wish to estimate their latent disturbance covariance,
-as mentioned above. .</p>
+<code class="sourceCode R"><span><span class="va">Mplus.VARIABLE.syntax.fragment.3</span> <span class="op">&lt;-</span> <span class="va">Mplus.VARIABLE.syntax.fragment.2</span></span></code></pre></div>
+<p>Now define the specifications for the fragment. These specifications
+mimic those for Fragment 2. The key difference is in the data. Here we
+are using the item responses from a different sample (Sample B) than
+used in the previous fragment. Note also that by setting
+<code>conditioning = 1</code> in this list of specifications, we are
+fitting this fragment conditional on Fragment 1, but not conditional on
+Fragment 2.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fragment.4.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"Working Memory Predict Word Learning"</span>,</span>
-<span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.4</span>,</span>
-<span>  conditioning <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>,</span>
-<span>  parameters.to.exclude.in.conditioning <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="co"># fragment 1</span></span>
-<span>    <span class="st">"none"</span>,</span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
-<span>    <span class="co"># fragment 2</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(co)variances of latent variables"</span><span class="op">)</span>,</span>
-<span></span>
-<span>    <span class="co"># fragment 3</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(co)variances of latent variables"</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
+<span><span class="va">fragment.3.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  name <span class="op">=</span><span class="st">"Sample B Items 1-10 Scoring"</span>,</span>
+<span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.3</span>,</span>
+<span>  variable.syntax <span class="op">=</span> <span class="va">Mplus.VARIABLE.syntax.fragment.3</span>,</span>
+<span>  conditioning <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  estimating.lvs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  lvs.to.estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"F1"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
+<span>    <span class="va">sim.IRT.data.sample.B</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"ID"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">sim.IRT.data.sample.B</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">num_range</a></span><span class="op">(</span><span class="st">"It"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -310,17 +253,14 @@ specifications for running MCMC and saving output. Running this code
 will write out output files.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MUPPET.modular.function.html">MUPPET.modular.function</a></span><span class="op">(</span></span>
+<span>    fragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fragment.1.specs</span>, <span class="va">fragment.2.specs</span>, <span class="va">fragment.3.specs</span><span class="op">)</span>,</span>
 <span>    n.chains <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    n.warmup <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>    n.burnin <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>    n.iters.per.chain.after.warmup.and.burnin <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>    n.estimation.batches <span class="op">=</span> <span class="fl">25</span>,</span>
-<span>    convergence.assessment <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span>    save.summary.stats.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>    save.summary.plots.from.MUPPET <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span>    save.draws.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>    fragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fragment.1.specs</span>, <span class="va">fragment.2.specs</span>, <span class="va">fragment.3.specs</span>, <span class="va">fragment.4.specs</span><span class="op">)</span>,</span>
-<span>    retain.iteration.files <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>    convergence.assessment <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>    save.summary.plots.from.MUPPET <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
   </div>

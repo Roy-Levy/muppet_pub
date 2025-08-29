@@ -71,7 +71,7 @@ Fragments</h1>
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>This example demonstrates how to use the muppet() package to perform
 MUPPET modeling for a structural equation modeling (SEM) example. This
@@ -87,7 +87,7 @@ Fragment 1 to the latent variables in Fragment 3 (and 2).</p>
 </h2>
 <p>Load the package and extract the data for this example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">muppet</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roy-levy.github.io/muppet_pub/">muppet</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim.POWER</span>, package <span class="op">=</span> <span class="st">"muppet"</span><span class="op">)</span></span>
 <span><span class="va">data.for.mplus</span> <span class="op">&lt;-</span> <span class="va">sim.POWER.data</span></span></code></pre></div>
 <p>Look through the data and check if any of the column names have more
@@ -144,9 +144,6 @@ passing along the syntax and data from above.</p>
 <span>  name <span class="op">=</span> <span class="st">"Working Memory Measurement Model"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.1</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -193,9 +190,6 @@ the argument that <code>conditioning = 0</code>.</p>
 <span>  name <span class="op">=</span> <span class="st">"Word Learning Measurement Model"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.2</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -237,9 +231,6 @@ are instructing the functions to condition on the results from Fragment
 <span>  name <span class="op">=</span> <span class="st">"Including More Word Learning Indicators"</span>,</span>
 <span>  model.syntax <span class="op">=</span> <span class="va">Mplus.MODEL.syntax.fragment.3</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -313,9 +304,6 @@ as mentioned above. .</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(co)variances of latent variables"</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  to.fit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  estimating.lvs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  priors.syntax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">data.for.mplus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -329,17 +317,14 @@ specifications for running MCMC and saving output. Running this code
 will write out output files.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/MUPPET.modular.function.html">MUPPET.modular.function</a></span><span class="op">(</span></span>
-<span>    n.chains <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>    n.warmup <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>    n.burnin <span class="op">=</span> <span class="fl">500</span>,</span>
-<span>    n.iters.per.chain.after.warmup.and.burnin <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>    n.estimation.batches <span class="op">=</span> <span class="fl">25</span>,</span>
-<span>    convergence.assessment <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span>    save.summary.stats.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>    save.summary.plots.from.MUPPET <span class="op">=</span> <span class="st">"unstandardized"</span>,</span>
-<span>    save.draws.from.MUPPET<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span>    fragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fragment.1.specs</span>, <span class="va">fragment.2.specs</span>, <span class="va">fragment.3.specs</span>, <span class="va">fragment.4.specs</span><span class="op">)</span>,</span>
-<span>    retain.iteration.files <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  fragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fragment.1.specs</span>, <span class="va">fragment.2.specs</span>, <span class="va">fragment.3.specs</span>, <span class="va">fragment.4.specs</span><span class="op">)</span>,</span>
+<span>  n.chains <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  n.warmup <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  n.burnin <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  n.iters.per.chain.after.warmup.and.burnin <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n.estimation.batches <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  convergence.assessment <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  save.summary.plots.from.MUPPET <span class="op">=</span> <span class="st">"none"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
   </div>
