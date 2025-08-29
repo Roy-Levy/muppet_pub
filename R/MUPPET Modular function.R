@@ -121,7 +121,7 @@ library(rlang)
 #'  }
 #'
 #'  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
-#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE.}
+#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.}
 #'  \item{data: The dataset to use in fitting this fragment.}
 
 
