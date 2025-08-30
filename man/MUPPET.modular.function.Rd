@@ -126,8 +126,11 @@ development.}
 \item{return.R.object}{Logical, indicating whether to return results as an R object. Default is FALSE. This was supported in earlier versions for a limited class of models. This is not current, and should not be set to TRUE. For future development.}
 }
 \value{
-A statement of how long it took. Future development will include returning objects to R.
+A statement of how long it took to run. The requested output files will be written out to the hard drive. Future development will include returning objects to R.
 }
 \description{
-Conducts modular MUPPET modeling.
+Conduct modular MUPPET modeling.
+}
+\seealso{
+For examples and tips, see https://roy-levy.github.io/muppet_pub/articles/index.html
 }

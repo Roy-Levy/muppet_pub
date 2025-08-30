@@ -2,6 +2,8 @@
 #'
 #' @title Converts a dataframe to an mcmc.list object
 #'
+#' @description This is an internal function, and is not intended to be called by users directly.
+
 #' @param df The dataframe to be converted to an mcmc.list object
 #' @param chain_col Do not alter
 #' @param iter_col Do not alter
