@@ -132,5 +132,5 @@ A statement of how long it took to run. The requested output files will be writt
 Conduct modular MUPPET modeling.
 }
 \seealso{
-For examples and tips, see https://roy-levy.github.io/muppet_pub/articles/index.html
+For examples and tips, see \href{https://roy-levy.github.io/muppet_pub/articles/index.html}{MUPPET Examples and Tips}
 }
