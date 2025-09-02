@@ -1,0 +1,240 @@
+---
+title: "IRT Calibration of Additional Items, in 3 Fragments"
+output: html_document
+date: "2025-08-29"
+---
+
+## Overview
+
+This example demonstrates how to use the muppet() package to perform MUPPET modeling for an item response theory (IRT) example. The example has 3 fragments, representing a situation where we are doing additional calibrations (i.e., estimating measurement model parameters) as new items are added over time, using data from different samples, where certain items serve as anchor items across adjacent administrations. 
+
+In Fragment 1, the measurement model is fit to a set of item responses for items 1-10 from a sample of examinees (referred to as Sample A). Fitting this fragment yields estimated measurement model (i.e., item) parameters. In Fragment 2, we use the data from another sample (Sample C) responding to items 6-15. The results from the items from Fragment 1 are carried forward to Fragment 2, and the new items (i.e., items 11-15) are calibrated to the existing scale. In Fragment 3, we use the data from another sample (Sample D) responding to items 11-20. The results from the items from the previous fragments 1 are carried forward to Fragment 3, and the new items (i.e., items 16-20) are calibrated to the existing scale. 
+
+In addition, this example demonstrates the use of the software for where certain fragments are fit in one call to the function, and then those fragments serve as antecedents for another fragment fit in a separate call for the function. This is supposed to mimic the situation where we wish to do estimation "as we go," so we wish to read in results for the antecedent fragments rather than re-fit those fragments.  
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+## Data Prepration
+
+Load the package and extract the data for this example. 
+
+```{r data-read-in}
+library(muppet)
+data(sim.IRT, package = "muppet")
+```
+
+
+## Specify Fragment 1
+
+Fragment 1 fits an IRT model to item responses to 10 items from Sample A. One key specification for Fragment 1 is the Mplus syntax for the IRT measurement model. In this specification the latent variable is modeled as having a fixed mean and variance. All the loadings (discriminations) and location parameters are estimated. 
+
+
+```{r fragment-1-model-syntax, eval = FALSE}
+Mplus.MODEL.syntax.fragment.1 <- "
+  F1 by It1-It10*;
+  [It1$1-It10$1];
+  F1@1;
+  [F1@0];
+"
+```
+
+
+As the observed variables are discrete (categorical), we will need to specify them as such for the Mplus VARIABLE command. To do so, define an R object with the desired text for the Mplus input file.  
+
+
+```{r fragment-1-variable-syntax, eval = FALSE}
+Mplus.VARIABLE.syntax.fragment.1 <- "
+     CATEGORICAL =
+        It1-It10
+    ;
+  "
+```
+
+Now define the data for this fragment, as the item responses from Sample A to items 1-10.
+
+```{r fragment-1-data, eval = FALSE}
+library(dplyr)
+data.fragment.1 =
+  bind_cols(
+    sim.IRT.data.sample.A %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.A %>%
+      dplyr::select(num_range("It", 1:10))
+  )
+```
+
+
+Now define the specifications for the fragment. In this list we are passing along the syntax from above. By setting `conditioning = 0` in this list of specifications, we are fitting this fragment without conditioning on any other fragment. 
+
+```{r fragment-1-specifications, eval = FALSE}
+fragment.1.specs <- list(
+  name = "Sample A Items 1-10 Calibration",
+  model.syntax = Mplus.MODEL.syntax.fragment.1,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.1,
+  conditioning = 0,
+  data = data.fragment.1
+)
+```
+
+
+
+## Specify Fragment 2
+
+In Fragment 2 we wish to calibrate new items (items 11-15), using responses from a new sample (Sample C), treating items 6-10 as anchor items. The model syntax includes the model specifications for the latent variable mean and variance. These were included in Fragment 1 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 1. But the latent variable mean and variance were not fitted parameters in Fragment 1. They were fixed in Fragment 1. So they will not be "brought forward" by looking at the fitted results from Fragment 1. So they need to be specified here as well.  
+
+```{r fragment-2-model-syntax, eval = FALSE}
+Mplus.MODEL.syntax.fragment.2 <- "
+  F1 by It11-It15*;
+  [It11$1-It15$1];
+  F1@1;
+  [F1@0];
+"
+```
+
+
+As was the case for Fragment 1, we will need to specify that the observed variables are discrete (categorical). To do so, we will define an R object with the desired text for the Mplus input file. Note that the code below does this for items 1-15, not just items 6-15 that have item responses in the Sample C used in this fragment. This is because we are carrying forward the results from Fragment 1, which include parameters and data for items 1-5. 
+
+
+```{r fragment-2-variable-syntax, eval = FALSE}
+Mplus.VARIABLE.syntax.fragment.2 <- "
+     CATEGORICAL =
+        It1-It15
+    ;
+  "
+```
+
+Now define the data for this fragment, as including the data used in Fragment 1 (item responses from Sample A to items 1-10) and the new data for this fragment (item responses from Sample C to items 6-15).
+
+```{r fragment-2-data, eval = FALSE}
+library(dplyr)
+temp.data.2 =
+  bind_cols(
+    sim.IRT.data.sample.C %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.C %>%
+      dplyr::select(num_range("It", 6:15))
+  )
+
+data.fragment.2 <- full_join(data.fragment.1, temp.data.2)
+rm(temp.data.2)
+
+```
+
+
+Now define the specifications for the fragment. In this list we are passing along the syntax from above. By setting `conditioning = 1` in this list of specifications, we are fitting this fragment conditioning on Fragment 1. 
+
+```{r fragment-2-specifications, eval = FALSE}
+fragment.2.specs <- list(
+  name = "Sample C Items 11-15 Calibration",
+  model.syntax = Mplus.MODEL.syntax.fragment.2,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.2,
+  conditioning = 1,
+  data = data.fragment.2
+)
+```
+
+
+
+## Specify Fragment 3
+
+In Fragment 3 we wish to calibrate new items (items 16-20), using responses from a new sample (Sample D), treating previous items as anchor items. The model syntax is similar to that for Fragment 2. 
+
+```{r fragment-3-model-syntax, eval = FALSE}
+Mplus.MODEL.syntax.fragment.3 <- "
+  F1 by It16-It20*;
+  [It16$1-It20$1];
+  F1@1;
+  [F1@0];
+"
+```
+
+
+As was the case for Fragment 1, we will need to specify that the observed variables are discrete (categorical). To do so, we will define an R object with the desired text for the Mplus input file. Note that the code below does this for items 1-20, not just items 11-20 that have item responses in the Sample D used in this fragment. This is because we are carrying forward the results from the previous fragments, which include parameters and data for the other items. 
+
+
+```{r fragment-3-variable-syntax, eval = FALSE}
+Mplus.VARIABLE.syntax.fragment.3 <- "
+     CATEGORICAL =
+        It1-It20
+    ;
+  "
+```
+
+Now define the data for this fragment, as including the data used in the previous fragments (namely, Fragment 2) and the new data for this fragment (item responses from Sample D to items 11-20).
+
+```{r fragment-3-data, eval = FALSE}
+library(dplyr)
+temp.data.3 =
+  bind_cols(
+    sim.IRT.data.sample.D %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.D %>%
+      dplyr::select(num_range("It", 11:20))
+  )
+
+data.fragment.3 <- full_join(data.fragment.2, temp.data.3)
+rm(temp.data.3)
+
+```
+
+
+Now define the specifications for the fragment. In this list we are passing along the syntax from above. By setting `conditioning = c(1,2)` in this list of specifications, we are fitting this fragment conditioning on Fragments 1 and 2. 
+
+```{r fragment-3-specifications, eval = FALSE}
+fragment.3.specs <- list(
+  name = "Sample D Items 16-20 Calibration",
+  model.syntax = Mplus.MODEL.syntax.fragment.3,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.3,
+  conditioning = c(1,2),
+  data = data.fragment.3
+)
+```
+
+
+
+## Conduct MUPPET modeling for Fragments 1 and 2
+
+The code below demonstrates conducting MUPPET modeling, but only for Fragments 1 and 2. The `fragments` argument contains the specifications for the model fragments defined above. The rest of the arguments communicate specifications for running MCMC and saving output. Running this code will write out output files. 
+
+
+```{r conduct-MUPPET-modeling, eval = FALSE}
+MUPPET.modular(
+    fragments = list(fragment.1.specs, fragment.2.specs),
+    n.chains = 2,
+    n.warmup = 0,
+    n.burnin = 500,
+    n.iters.per.chain.after.warmup.and.burnin = 100,
+    n.estimation.batches = 25,
+    convergence.assessment = "none",
+    save.summary.plots.from.MUPPET = "none"
+```
+
+
+## Conduct MUPPET modeling for Fragment 3
+
+The code below demonstrates conducting MUPPET modeling for fitting Fragment 3, reading in the results for Fragments 1 and 2. To indicate that Fragments 1 and 2 are not be fit, we change their specifications to indicate they are not to be fit. 
+
+```{r change-specs, eval = FALSE}
+fragment.1.specs$to.fit = FALSE
+fragment.2.specs$to.fit = FALSE
+```
+
+
+When running the MUPPET analysis below, the results for Fragments 1 and 2 will be read in to fit Fragment 2. 
+
+```{r conduct-MUPPET-modeling-again, eval = FALSE}
+MUPPET.modular(
+    fragments = list(fragment.1.specs, fragment.2.specs,fragment.3.specs),
+    n.chains = 2,
+    n.warmup = 0,
+    n.burnin = 500,
+    n.iters.per.chain.after.warmup.and.burnin = 100,
+    n.estimation.batches = 25,
+    convergence.assessment = "none",
+    save.summary.plots.from.MUPPET = "none"
+)
+```

@@ -4,7 +4,7 @@ output: html_document
 date: "2025-08-29"
 ---
 
-## Introduction
+## Overview
 
 This example demonstrates how to use the muppet() package to perform MUPPET modeling for an item response theory (IRT) example. The example has 3 fragments. In Fragment 1 (calibration), the measurement model is fit to a set of item responses for 10 items from a sample of examinees (referred to as Sample A). Fitting this fragment yields estimated measurement model (i.e., item) parameters. In Fragment 2, the results from Fragment 1 are used to estimate latent variable values for the examinees from this same dataset, Sample A (i.e., conduct in-sample scoring). In Fragment 3, the results from Fragment 1 are used to estimate latent variable values of for a different set of examinees (Sample B) whose data were not part of the calibration process (i.e., conduct out-of-sample scoring).
 
@@ -51,20 +51,22 @@ Mplus.VARIABLE.syntax.fragment.1 <- "
 ```
 
 
-
-
-
-Now define the specifications for the fragment. In this list we are passing along the syntax and data from above.  
+Now define the specifications for the fragment. In this list we are passing along the syntax from above. By setting `conditioning = 0` in this list of specifications, we are fitting this fragment without conditioning on any other fragment. The data argument selects the relevant item responses from the raw dataset, namely those from Sample A responding to items 1-10.   
 
 ```{r fragment-1-specifications, eval = FALSE}
+library(dplyr)
+
 fragment.1.specs <- list(
-  name = "Working Memory Measurement Model",
+  name = "Sample A Items 1-10 Calibration",
   model.syntax = Mplus.MODEL.syntax.fragment.1,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.1,
   conditioning = 0,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
-  data = data.for.mplus
+  data =   bind_cols(
+    sim.IRT.data.sample.A %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.A %>%
+      dplyr::select(num_range("It", 1:10))
+  )
 )
 ```
 
@@ -72,143 +74,88 @@ fragment.1.specs <- list(
 
 ## Specify Fragment 2
 
-Fragment 2 is a factor analytic measurement model, similar to Fragment 1. Here again, the key specification is the Mplus syntax for the factor analytic measurement model, where as above, the means and variances for the (2) latent variables are fixed, and the loadings are estimated. 
+In Fragment 2 we wish to estimate the latent variables for the examinees from Fragment 1. So our model is the same as it was in Fragment 1. The model syntax just includes the model specifications for the latent variable mean and variance. These were included in Fragment 1 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 1. But the latent variable mean and variance were not fitted parameters in Fragment 1. They were fixed in Fragment 1. So they will not be "brought forward" by looking at the fitted results from Fragment 1. So they need to be specified here as well. 
 
 ```{r fragment-2-model-syntax, eval = FALSE}
 Mplus.MODEL.syntax.fragment.2 <- "
-    ! Word Learning Factor Model
-
-  ! Phonological
-  PHON BY
-  ICPVL1gm* ICPVL2gm DIPVL1gm DIPVL2gm
-  SIPVL1gm SIPVL2gm LTPVL1gm LTPVL2gm ICNT2P ICNT1P
-  DINT1P DINT2P PINTGM
-  PIPVLgm;
-
-  ! Semantic
-  SEM BY ICVDD2ap* SIVDD1ap SIVDD2ap PIVDD0ap PIVFRgmp
-  ICVDD1ap SIVFR1gm SIVFR2gm LTVFR1gm LTVFR2gm;
-
-  ! Factor Variances
-  PHON@1;
-  SEM@1;
-
-  ! Factor Correlations
-  PHON WITH SEM;
-
-  ! Factor Means
-  [PHON@0];
-  [SEM@0];
-  "
+  F1@1;
+  [F1@0];
+"
 ```
 
-Now define the specifications for the fragment. In this list we are passing along the syntax and data from above. Note that even though this is Fragment 2, it is not conditional on Fragment 1. This is expressed by the argument that `conditioning = 0`. 
+
+As in Fragment 1, we need to communicate that the observed variables are discrete (categorical). To do so, we can simply define an R object with the desired text for the Mplus input file as being just as it was in Fragment 1.  
+
+
+```{r fragment-2-variable-syntax, eval = FALSE}
+Mplus.VARIABLE.syntax.fragment.2 <- Mplus.VARIABLE.syntax.fragment.1
+
+```
+
+Now define the specifications for the fragment. In this list we are passing along the syntax from above. By setting `conditioning = 1` in this list of specifications, we are fitting this fragment conditional on Fragment 1. We declare that this fragment involves estimating latent variables by setting `estimating.lvs = TRUE`. In the next argument, we give the text for the names of the latent variables to be estimated. This name must correpond to the name in the Mplus syntax. In this case, the name of the latent variable in Mplus is `F1`, so we indicate that `lvs.to.estimate = c("F1")`. The data are the same data as in Fragment 1. We are using the same dataset in both fragments; here in Fragment 2 we are estimating the latent variables for the same examinees that were used in Fragment 1. That is, we are conducting in-sample scoring conditional on the calibration in Fragment 1. 
+
 
 ```{r fragment-2-specifications, eval = FALSE}
+library(dplyr)
+
 fragment.2.specs <- list(
-  name = "Word Learning Measurement Model",
+  name ="Sample A Items 1-10 Scoring",
   model.syntax = Mplus.MODEL.syntax.fragment.2,
-  conditioning = 0,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
-  data = data.for.mplus
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.2,
+  conditioning = 1,
+  estimating.lvs = TRUE,
+  lvs.to.estimate = c("F1"),
+  data = bind_cols(
+    sim.IRT.data.sample.A %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.A %>%
+      dplyr::select(num_range("It", 1:10))
+  )
 )
 ```
 
 ## Specify Fragment 3
 
-Fragment 3 is conditional on Fragment 2, and adds to it by including additional variables as indicators for one of the latent variables. Note that the syntax here also includes the specifications fixing the latent variable means and variances. These were included in Fragment 1 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 2. But the latent variable means and variances were not fitted parameters in Fragment 2. They were fixed in Fragment 2. So they will not be "brought forward" by looking at the fitted results from Fragment 2. So they need to be specified here as well. 
+Fragment 3 is like Fragment 2 in that we wish to estimate the latent variables for examinees. The difference is that these examinees are not the same as those used in Fragment 1 (i.e., Fragment 3 pursues out-of-sample scoring. The model is the same as it was in Fragments 1 and 2. Like the syntax for Fragmen 2, the model syntax here just includes the model specifications for the latent variable mean and variance. These were included in Fragment 1 as well, but as discussed above also need to be here to preserve this constraint. 
 
 
 ```{r fragment-3-model-syntax, eval = FALSE}
 Mplus.MODEL.syntax.fragment.3 <- "
-  ! Word Learning Factor Model
-
-  ! Phonological
-  PHON BY PIMD0ap* ICMD2ap ICMD1ap DIMD1ap  DIMD2ap;
-
-  ! Factor Variances
-  PHON@1;
-  SEM@1;
-
-  ! Factor Means
-  [PHON@0];
-  [SEM@0];
-  "
+  F1@1;
+  [F1@0];
+"
 ```
 
-Now define the specifications for the fragment. In this list we are passing along the syntax and data, as we did for other fragments. By setting `conditioning = 2` in this list of specifications, we are instructing the functions to condition on the results from Fragment 2. 
+
+Once again we need to communicate that the observed variables are discrete (categorical). To do so, we can simply define an R object with the desired text for the Mplus input file as being just as it was in Fragment 2.  
+
+
+```{r fragment-3-variable-syntax, eval = FALSE}
+Mplus.VARIABLE.syntax.fragment.3 <- Mplus.VARIABLE.syntax.fragment.2
+```
+
+
+Now define the specifications for the fragment. These specifications mimic those for Fragment 2. The key difference is in the data. Here we are using the item responses from a different sample (Sample B) than used in the previous fragment. Note also that by setting `conditioning = 1` in this list of specifications, we are fitting this fragment conditional on Fragment 1, but not conditional on Fragment 2. 
 
 
 ```{r fragment-3-specifications, eval = FALSE}
+library(dplyr)
+
 fragment.3.specs <- list(
-  name = "Including More Word Learning Indicators",
+  name ="Sample B Items 1-10 Scoring",
   model.syntax = Mplus.MODEL.syntax.fragment.3,
-  conditioning = 2,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
-  data = data.for.mplus
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.3,
+  conditioning = 1,
+  estimating.lvs = TRUE,
+  lvs.to.estimate = c("F1"),
+  data = bind_cols(
+    sim.IRT.data.sample.B %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.B %>%
+      dplyr::select(num_range("It", 1:10))
+  )
 )
 ```
-
-## Specify Fragment 4
-
-Fragment 4 contains the structural portion relating the latent variables from Fragment 1 to those in Fragment 3 (which were also a part of Fragment 2). The latent variables from Fragment 1 are were exogenous in that fragment, and remain so here. Accordingly, in the Mplus syntax their factor means and variances are fixed, as they were in Fragment 1. In contrast, the latent variables from Fragment 3 were exogenous in Fragment 3, but are now endogenous (being predicted by the latent variables from Fragment 1). Accordingly, Even though their means and variances were fixed in Fragment 3, those parameters are now functions of other parameters, and we estimate intercepts and latent disturbance variances for those latent variables as part of the structural model. Note also that the correlation between the latent disturbances is part of the fitted model here. This is for the same reason.  
-
-```{r fragment-4-model-syntax, eval = FALSE}
-Mplus.MODEL.syntax.fragment.4 <- "
-
-  ! Structural relations
-  PHON ON CE FOA PSR;
-  SEM ON CE FOA PSR;
-
-  ! Structural intercepts
-  [PHON];
-  [SEM];
-
-  ! Latent correlations (disturbances)
-  PHON WITH SEM;
-
-  ! Factor Variances
-  CE@1;
-  FOA@1;
-  PSR@1;
-
-  ! Factor Means
-  [CE@0];
-  [FOA@0];
-  [PSR@0];
-  "
-```
-
-Now define the specifications for the fragment. The first key element here is `conditioning = c(1,2,3)`. This communicates that Fragment 4 is conditional on Fragments 1, 2, and 3. The next key element here is `parameters.to.exclude.in.conditioning`. This is a list with 3 entries, corresponding to the 3 fragments that we are conditioning on. The entries in the list express which parameters from that antecedent fragment to ignore (i.e., not carry forward to Fragment 4). In this example, we want to carry forward all the fitted parameters from Fragment 1, so the first element in the list is `none`. But we do want to ignore some of the fitted parameters from Fragment 2 and 3. In particular, we want to ignore the fitted covariances among the latent variables in those fragments, because those fragments are now endogenous, and we wish to estimate their latent disturbance covariance, as mentioned above. . 
-
-
-```{r fragment-4-specifications, eval = FALSE}
-fragment.4.specs <- list(
-  name = "Working Memory Predict Word Learning",
-  model.syntax = Mplus.MODEL.syntax.fragment.4,
-  conditioning = c(1,2,3),
-  parameters.to.exclude.in.conditioning = list(
-    # fragment 1
-    "none",
-
-    # fragment 2
-    c("(co)variances of latent variables"),
-
-    # fragment 3
-    c("(co)variances of latent variables")
-
-  ),
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
-  data = data.for.mplus
-)
-```
-
 
 ## Conduct MUPPET modeling
 
@@ -216,18 +163,14 @@ The code below demonstrates conducting MUPPET modeling. The `fragments` argument
 
 
 ```{r conduct-MUPPET-modeling, eval = FALSE}
-MUPPET.modular.function(
+MUPPET.modular(
+    fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs),
     n.chains = 2,
     n.warmup = 0,
     n.burnin = 500,
     n.iters.per.chain.after.warmup.and.burnin = 100,
     n.estimation.batches = 25,
-    convergence.assessment = "unstandardized",
-    save.summary.stats.from.MUPPET=TRUE,
-    save.summary.plots.from.MUPPET = "unstandardized",
-    save.draws.from.MUPPET=TRUE,
-    fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs, fragment.4.specs),
-    retain.iteration.files = FALSE
+    convergence.assessment = "none",
+    save.summary.plots.from.MUPPET = "none",
 )
 ```
-

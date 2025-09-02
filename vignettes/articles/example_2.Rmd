@@ -4,7 +4,7 @@ output: html_document
 date: "2025-08-28"
 ---
 
-## Introduction
+## Overview
 
 This example demonstrates how to use the muppet() package to perform MUPPET modeling for a structural equation modeling (SEM) example. This example has 4 fragments. Fragment 1 is the measurement model for 3 latent variables. Fragment 2 defines a measurement model for 2 other latent variables. Fragment 3 then adds to the measurement model in Fragment 2, by adding some indicators to one of the latent variables. Fragment 4 is a structural model relating the latent variables from Fragment 1 to the latent variables in Fragment 3 (and 2). 
 
@@ -77,9 +77,6 @@ fragment.1.specs <- list(
   name = "Working Memory Measurement Model",
   model.syntax = Mplus.MODEL.syntax.fragment.1,
   conditioning = 0,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
   data = data.for.mplus
 )
 ```
@@ -125,9 +122,6 @@ fragment.2.specs <- list(
   name = "Word Learning Measurement Model",
   model.syntax = Mplus.MODEL.syntax.fragment.2,
   conditioning = 0,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
   data = data.for.mplus
 )
 ```
@@ -162,9 +156,6 @@ fragment.3.specs <- list(
   name = "Including More Word Learning Indicators",
   model.syntax = Mplus.MODEL.syntax.fragment.3,
   conditioning = 2,
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
   data = data.for.mplus
 )
 ```
@@ -218,9 +209,6 @@ fragment.4.specs <- list(
     c("(co)variances of latent variables")
 
   ),
-  to.fit = TRUE,
-  estimating.lvs = FALSE,
-  priors.syntax = NULL,
   data = data.for.mplus
 )
 ```
@@ -232,18 +220,15 @@ The code below demonstrates conducting MUPPET modeling. The `fragments` argument
 
 
 ```{r conduct-MUPPET-modeling, eval = FALSE}
-MUPPET.modular.function(
-    n.chains = 2,
-    n.warmup = 0,
-    n.burnin = 500,
-    n.iters.per.chain.after.warmup.and.burnin = 100,
-    n.estimation.batches = 25,
-    convergence.assessment = "unstandardized",
-    save.summary.stats.from.MUPPET=TRUE,
-    save.summary.plots.from.MUPPET = "unstandardized",
-    save.draws.from.MUPPET=TRUE,
-    fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs, fragment.4.specs),
-    retain.iteration.files = FALSE
+MUPPET.modular(
+  fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs, fragment.4.specs),
+  n.chains = 2,
+  n.warmup = 0,
+  n.burnin = 500,
+  n.iters.per.chain.after.warmup.and.burnin = 100,
+  n.estimation.batches = 25,
+  convergence.assessment = "none",
+  save.summary.plots.from.MUPPET = "none"
 )
 ```
 

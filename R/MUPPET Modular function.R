@@ -26,7 +26,7 @@ library(rlang)
 #'
 #' @title MUPPET Analysis
 #'
-#' @description  Conducts modular MUPPET modeling.
+#' @description  Conduct modular MUPPET modeling.
 #'
 #' @param fragments A list with elements defining the model fragments. Each
 #'   element in this list contains a set of specifications for the corresponding
@@ -134,10 +134,16 @@ library(rlang)
 
 
 #'
-#' @return A statement of how long it took. Future development will include returning objects to R.
+#' @return A statement of how long it took to run. The requested output files will be written out to the hard drive. Future development will include returning objects to R.
+
+#' @seealso For examples and tips, see \href{https://roy-levy.github.io/muppet_pub/articles/index.html}{MUPPET Examples and Tips}
+#'
+
+
+
 #' @export
 #'
-MUPPET.modular.function <- function(
+MUPPET.modular <- function(
     # software.environment = "Mplus", # Currently supporting Mplus, others in development
 
     fragments = NULL,

@@ -17,5 +17,5 @@ df_to_mcmc_list(df, chain_col = "Chain.number", iter_col = "Iteration.number")
 An mcmc.list object
 }
 \description{
-Converts a dataframe to an mcmc.list object
+This is an internal function, and is not intended to be called by users directly.
 }

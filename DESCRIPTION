@@ -1,12 +1,12 @@
 Package: muppet
 Type: Package
 Title: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling
-Version: 0.1.2
-Authors@R:
-  person(given = "Roy",
-         family = "Levy",
-         email = "Roy.Levy@asu.edu",
-         role = c("aut", "cre"))
+Version: 0.1.3
+Authors@R: c(
+    person("Roy", "Levy", , "Roy.Levy@asu.edu", role = c("aut", "cre")),
+    person("Karina", "Cahill", role = "ctb"),
+    person("Juanjo", "Mesa", role = "ctb")
+  )
 Description: Conducts MUPPET modeling for latent variable and structural equation models.
 License: MIT
 Encoding: UTF-8

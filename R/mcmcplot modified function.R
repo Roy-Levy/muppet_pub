@@ -4,13 +4,13 @@
 #'
 #' @title Plot MCMC draws
 #'
-#' @description A modified version of the mcmcplot() function from the mcmcplots. Modified to not automatically open the html file that is created. This version creates and saves various plots and an HTML file collecting them (but does not automatically open the HTML file.)
+#' @description A modified version of the mcmcplot() function from the mcmcplots. Modified to not automatically open the html file that is created. This version creates and saves various plots and an HTML file collecting them (but does not automatically open the HTML file.) This function is not intended to be called by users directly.
 
 #' @param See mcmcplot() from mcmcplots() package.
 #'
 #' @return See mcmcplot() from mcmcplots() package.
 #'
-#' @examples See mcmcplot() from mcmcplots() package.
+#' @seealso See mcmcplot() from mcmcplots() package.
 
    mcmcplot.mod <- function(...) {
     # Save the current browser options

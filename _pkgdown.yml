@@ -12,11 +12,24 @@ navbar:
       text: Examples and Tips
       href: articles/index.html
 
+# This eliminates the text in the bottom left footer
+template:
+  bootstrap: 5
+  bslib:
+    base_font: {google: "Roboto"}
+  includes:
+    in_header: |
+      <style>
+      .pkgdown-footer-left { display: none; }
+      </style>
+
 articles:
 - title: "Examples and Tips"
   contents:
   - articles/tips
   - articles/example_1
   - articles/example_2
+  - articles/example_3
+  - articles/example_4
 
 

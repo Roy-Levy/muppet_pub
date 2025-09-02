@@ -13,8 +13,8 @@ mcmcplot.mod(...)
 See mcmcplot() from mcmcplots() package.
 }
 \description{
-A modified version of the mcmcplot() function from the mcmcplots. Modified to not automatically open the html file that is created. This version creates and saves various plots and an HTML file collecting them (but does not automatically open the HTML file.)
+A modified version of the mcmcplot() function from the mcmcplots. Modified to not automatically open the html file that is created. This version creates and saves various plots and an HTML file collecting them (but does not automatically open the HTML file.) This function is not intended to be called by users directly.
 }
-\examples{
+\seealso{
 See mcmcplot() from mcmcplots() package.
 }
