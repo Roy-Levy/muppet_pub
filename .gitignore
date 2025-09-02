@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+
+publish_package.R
