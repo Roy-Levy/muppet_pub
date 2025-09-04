@@ -4,11 +4,11 @@ The `muppet` package executes Measurement and Uncertainty Preserving ParamETric 
 
 ## Installation
 
-You can install the current public version of muppet from GitHub:
+You can install the current public version of muppet from GitHub with:
 
 ```r
-# install.packages("devtools")
-devtools::install_github("Roy-Levy/muppet_pub")
+# install.packages("remotes")  # if you don't have remotes installed
+remotes::install_github("Roy-Levy/muppet_pub")
 ```
 
 ## Examples
