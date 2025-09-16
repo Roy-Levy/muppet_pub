@@ -57,9 +57,14 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the current public version of muppet from GitHub with:</p>
+<p>You can install the current public version of <code>muppet</code> from GitHub. It depends on other packages for certain fuctionality. <code>muppet</code> uses functions that are part of the <code>mcmcplots</code> package, developed by S. McKay Curtis, to plot results from the chains. However, <code>mcmcplots</code> is no longer availabe on CRAN. A verion of <code>mcmcplots</code> may be installed from GitHub, and then <code>muppet</code> can also be installed from GitHub. This may be done as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")  # if you don't have remotes installed</span></span>
+<span></span>
+<span><span class="co"># Install mcmcplots from maintained fork</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Roy-Levy/mcmcplots"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Then install muppet</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Roy-Levy/muppet_pub"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
