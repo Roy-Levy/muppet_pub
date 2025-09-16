@@ -4,10 +4,15 @@ The `muppet` package executes Measurement and Uncertainty Preserving ParamETric 
 
 ## Installation
 
-You can install the current public version of muppet from GitHub with:
+You can install the current public version of `muppet` from GitHub. It depends on other packages for certain fuctionality. `muppet` uses functions that are part of the `mcmcplots` package, developed by S. McKay Curtis, to plot results from the chains. However, `mcmcplots` is no longer availabe on CRAN. A verion of `mcmcplots` may be installed from GitHub, and then `muppet` can also be installed from GitHub. This may be done as follows:
 
 ```r
 # install.packages("remotes")  # if you don't have remotes installed
+
+# Install mcmcplots from maintained fork
+remotes::install_github("Roy-Levy/mcmcplots")
+
+# Then install muppet
 remotes::install_github("Roy-Levy/muppet_pub")
 ```
 
