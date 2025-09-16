@@ -18,6 +18,7 @@ Imports:
     readr,
     dplyr,
     tibble,
+    tidyverse,
     stringr,
     coda,
     MCMCvis,
