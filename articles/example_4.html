@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>IRT Calibration of Additional Items, in 3 Fragments • muppet</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Roboto-0.4.7/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Roboto-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="IRT Calibration of Additional Items, in 3 Fragments">
 <style>
 .pkgdown-footer-left { display: none; }
@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muppet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,7 @@ where we wish to do estimation “as we go,” so we wish to read in results
 for the antecedent fragments rather than re-fit those fragments.</p>
 </div>
 <div class="section level2">
-<h2 id="data-prepration">Data Prepration<a class="anchor" aria-label="anchor" href="#data-prepration"></a>
+<h2 id="data-preparation">Data Preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h2>
 <p>Load the package and extract the data for this example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -284,8 +284,8 @@ Running this code will write out output files.</p>
 </h2>
 <p>The code below demonstrates conducting MUPPET modeling for fitting
 Fragment 3, reading in the results for Fragments 1 and 2. To indicate
-that Fragments 1 and 2 are not be fit, we change their specifications to
-indicate they are not to be fit.</p>
+that Fragments 1 and 2 are not to be fit, we change their specifications
+to indicate they are not to be fit.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fragment.1.specs</span><span class="op">$</span><span class="va">to.fit</span> <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="va">fragment.2.specs</span><span class="op">$</span><span class="va">to.fit</span> <span class="op">=</span> <span class="cn">FALSE</span></span></code></pre></div>
@@ -310,11 +310,11 @@ and 2 will be read in to fit Fragment 2.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Roy Levy.</p>
+  <p>Developed by Roy Levy, Yadi Li.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -1,0 +1,213 @@
+# IRT Calibration, In-Sample Scoring, & Out-Of-Sample Scoring, in 3 Fragments
+
+## Overview
+
+This example demonstrates how to use the muppet() package to perform
+MUPPET modeling for an item response theory (IRT) example. The example
+has 3 fragments. In Fragment 1 (calibration), the measurement model is
+fit to a set of item responses for 10 items from a sample of examinees
+(referred to as Sample A). Fitting this fragment yields estimated
+measurement model (i.e., item) parameters. In Fragment 2, the results
+from Fragment 1 are used to estimate latent variable values for the
+examinees from this same dataset, Sample A (i.e., conduct in-sample
+scoring). In Fragment 3, the results from Fragment 1 are used to
+estimate latent variable values for a different set of examinees (Sample
+B) whose data were not part of the calibration process (i.e., conduct
+out-of-sample scoring).
+
+## Data Preparation
+
+Load the package and extract the data for this example.
+
+``` r
+library(muppet)
+data(sim.IRT, package = "muppet")
+```
+
+## Specify Fragment 1
+
+Fragment 1 fits an IRT model to item responses to 10 items. One key
+specification for Fragment 1 is the Mplus syntax for the IRT measurement
+model. In this specification the latent variable is modeled as having a
+fixed mean and variance. All the loadings (discriminations) and location
+parameters are estimated.
+
+``` r
+Mplus.MODEL.syntax.fragment.1 <- "
+  F1 by It1-It10*;
+  [It1$1-It10$1];
+  F1@1;
+  [F1@0];
+"
+```
+
+As the observed variables are discrete (categorical), we will need to
+specify them as such for the Mplus VARIABLE command. To do so, define an
+R object with the desired text for the Mplus input file.
+
+``` r
+Mplus.VARIABLE.syntax.fragment.1 <- "
+     CATEGORICAL =
+        It1-It10
+    ;
+  "
+```
+
+Now define the specifications for the fragment. In this list we are
+passing along the syntax from above. By setting `conditioning = 0` in
+this list of specifications, we are fitting this fragment without
+conditioning on any other fragment. The data argument selects the
+relevant item responses from the raw dataset, namely those from Sample A
+responding to items 1-10.
+
+``` r
+library(dplyr)
+
+fragment.1.specs <- list(
+  name = "Sample A Items 1-10 Calibration",
+  model.syntax = Mplus.MODEL.syntax.fragment.1,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.1,
+  conditioning = 0,
+  data =   bind_cols(
+    sim.IRT.data.sample.A %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.A %>%
+      dplyr::select(num_range("It", 1:10))
+  )
+)
+```
+
+## Specify Fragment 2
+
+In Fragment 2 we wish to estimate the latent variables for the examinees
+from Fragment 1. So our model is the same as it was in Fragment 1. The
+model syntax just includes the model specifications for the latent
+variable mean and variance. These were included in Fragment 1 as well,
+but also need to be here to preserve this constraint. In effect, the
+function will bring in the results for the *fitted* parameters from
+Fragment 1. But the latent variable mean and variance were not fitted
+parameters in Fragment 1. They were fixed in Fragment 1. So they will
+not be “brought forward” by looking at the fitted results from
+Fragment 1. So they need to be specified here as well.
+
+``` r
+Mplus.MODEL.syntax.fragment.2 <- "
+  F1@1;
+  [F1@0];
+"
+```
+
+As in Fragment 1, we need to communicate that the observed variables are
+discrete (categorical). To do so, we can simply define an R object with
+the desired text for the Mplus input file as being just as it was in
+Fragment 1.
+
+``` r
+Mplus.VARIABLE.syntax.fragment.2 <- Mplus.VARIABLE.syntax.fragment.1
+```
+
+Now define the specifications for the fragment. In this list we are
+passing along the syntax from above. By setting `conditioning = 1` in
+this list of specifications, we are fitting this fragment conditional on
+Fragment 1. We declare that this fragment involves estimating latent
+variables by setting `estimating.lvs = TRUE`. In the next argument, we
+give the text for the names of the latent variables to be estimated.
+This name must correspond to the name in the Mplus syntax. In this case,
+the name of the latent variable in Mplus is `F1`, so we indicate that
+`lvs.to.estimate = c("F1")`. The data are the same data as in
+Fragment 1. We are using the same dataset in both fragments; here in
+Fragment 2 we are estimating the latent variables for the same examinees
+that were used in Fragment 1. That is, we are conducting in-sample
+scoring conditional on the calibration in Fragment 1.
+
+``` r
+library(dplyr)
+
+fragment.2.specs <- list(
+  name ="Sample A Items 1-10 Scoring",
+  model.syntax = Mplus.MODEL.syntax.fragment.2,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.2,
+  conditioning = 1,
+  estimating.lvs = TRUE,
+  lvs.to.estimate = c("F1"),
+  data = bind_cols(
+    sim.IRT.data.sample.A %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.A %>%
+      dplyr::select(num_range("It", 1:10))
+  )
+)
+```
+
+## Specify Fragment 3
+
+Fragment 3 is like Fragment 2 in that we wish to estimate the latent
+variables for examinees. The difference is that these examinees are not
+the same as those used in Fragment 1 (i.e., Fragment 3 pursues
+out-of-sample scoring). The model is the same as it was in Fragments 1
+and 2. Like the syntax for Fragment 2, the model syntax here just
+includes the model specifications for the latent variable mean and
+variance. These were included in Fragment 1 as well, but as discussed
+above also need to be here to preserve this constraint.
+
+``` r
+Mplus.MODEL.syntax.fragment.3 <- "
+  F1@1;
+  [F1@0];
+"
+```
+
+Once again we need to communicate that the observed variables are
+discrete (categorical). To do so, we can simply define an R object with
+the desired text for the Mplus input file as being just as it was in
+Fragment 2.
+
+``` r
+Mplus.VARIABLE.syntax.fragment.3 <- Mplus.VARIABLE.syntax.fragment.2
+```
+
+Now define the specifications for the fragment. These specifications
+mimic those for Fragment 2. The key difference is in the data. Here we
+are using the item responses from a different sample (Sample B) than
+used in the previous fragment. Note also that by setting
+`conditioning = 1` in this list of specifications, we are fitting this
+fragment conditional on Fragment 1, but not conditional on Fragment 2.
+
+``` r
+library(dplyr)
+
+fragment.3.specs <- list(
+  name ="Sample B Items 1-10 Scoring",
+  model.syntax = Mplus.MODEL.syntax.fragment.3,
+  variable.syntax = Mplus.VARIABLE.syntax.fragment.3,
+  conditioning = 1,
+  estimating.lvs = TRUE,
+  lvs.to.estimate = c("F1"),
+  data = bind_cols(
+    sim.IRT.data.sample.B %>%
+      dplyr::select(contains("ID")),
+    sim.IRT.data.sample.B %>%
+      dplyr::select(num_range("It", 1:10))
+  )
+)
+```
+
+## Conduct MUPPET modeling
+
+The code below demonstrates conducting MUPPET modeling. The `fragments`
+argument contains the specifications for the model fragments defined
+above. The rest of the arguments communicate specifications for running
+MCMC and saving output. Running this code will write out output files.
+
+``` r
+MUPPET.modular(
+    fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs),
+    n.chains = 2,
+    n.warmup = 0,
+    n.burnin = 500,
+    n.iters.per.chain.after.warmup.and.burnin = 100,
+    n.estimation.batches = 25,
+    convergence.assessment = "none",
+    save.summary.plots.from.MUPPET = "none",
+)
+```
