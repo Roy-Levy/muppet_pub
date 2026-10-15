@@ -1,17 +1,17 @@
 Package: muppet
 Type: Package
 Title: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling
-Version: 0.1.4
+Version: 0.2.0
 Authors@R: c(
     person("Roy", "Levy", , "Roy.Levy@asu.edu", role = c("aut", "cre")),
     person("Karina", "Cahill", role = "ctb"),
-    person("Juanjo", "Mesa", role = "ctb")
+    person("Juanjo", "Mesa", role = "ctb"),
+    person("Yadi", "Li", role = "aut")
   )
 Description: Conducts MUPPET modeling for latent variable and structural equation models.
 License: MIT
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
 Imports: 
     rlang,
     MplusAutomation,
@@ -28,4 +28,7 @@ Imports:
     doParallel,
     Hmisc,
     tinytable,
+    ggplot2,
+    future
 URL: https://roy-levy.github.io/muppet_pub/
+Config/roxygen2/version: 8.0.0

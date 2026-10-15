@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 
-## Data Prepration
+## Data Preparation
 
 Load the package and extract the data for this example. 
 
@@ -216,7 +216,7 @@ MUPPET.modular(
 
 ## Conduct MUPPET modeling for Fragment 3
 
-The code below demonstrates conducting MUPPET modeling for fitting Fragment 3, reading in the results for Fragments 1 and 2. To indicate that Fragments 1 and 2 are not be fit, we change their specifications to indicate they are not to be fit. 
+The code below demonstrates conducting MUPPET modeling for fitting Fragment 3, reading in the results for Fragments 1 and 2. To indicate that Fragments 1 and 2 are not to be fit, we change their specifications to indicate they are not to be fit. 
 
 ```{r change-specs, eval = FALSE}
 fragment.1.specs$to.fit = FALSE

@@ -14,6 +14,7 @@
 #' @import readr
 #' @import tibble
 #' @import rlang
+#' @import ggplot2
 
 .onLoad <- function(libname, pkgname) {
 # Ensure rlang is loaded when your package loads, b/c otherwise tinytable won't access it properly to write out tables
@@ -45,7 +46,7 @@ library(rlang)
   #'  conditional on the first fragment in the fragments list; a value of c(1, 2)
   #'  indicates the fragment is conditional on fragment 1 and fragment 2 in the
   #'  fragments list.}
-#'  \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for pkg{conditioning}).
+#'  \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for \code{conditioning}).
 #'  Each element of the list is a character, or character vector, naming the kinds of parameters from the associated antecedent fragment that should be ignored in fitting this fragment.
 #'  Possible values are:
 #'
@@ -60,43 +61,50 @@ library(rlang)
 #'    \item "means and intercepts of latent variables"
 #'  }
 #'  A value of "none" indicates that all fitted parameters from the antecedent
-#'  fragment should be conditioned on. For example, if pkg{conditioning} = c(1,2),
-#'  and pkg{parameters.to.exclude.in.conditioning} = list("none", c("(co)variances of
-#'  latent variables", "means and intercepts of latent variables")),then none of
+#'  fragment should be conditioned on. For example, if \code{conditioning = c(1,2)},
+#'  and \code{parameters.to.exclude.in.conditioning = list("none", c("(co)variances of
+#'  latent variables", "means and intercepts of latent variables"))}, then none of
 #'  the parameters from fragment 1 will be ignored, while there will be
 #'  parameters from fragment 2 that are ignored. These parameters include the
 #'  (co)variances of latent variables and the means and intercepts of latent
 #'  variables.
 
 #'
-#'  If no value for pkg{parameters.to.exclude.in.conditioning}is supplied, the default is "none" for all antecedent fragments.
+#'  If no value for \code{parameters.to.exclude.in.conditioning} is supplied, the default is "none" for all antecedent fragments.
 #'  }
 #'
 #'  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
-#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.}
+#'  \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.
+#'
+#'  \code{estimating.lvs = TRUE} should not be specified for unconditional fragment.}
 #'  \item{data: The dataset to use in fitting this fragment.}
-
+#'  \item{model.check.this.fragment: Logical, indicating if model checking should be conducted for this fragment.
+#'  If no value is supplied, defaults to the value of \code{model.check}.
+#'  Model checking is only available when \code{estimating.lvs = FALSE}.}
 
 #'}
 #'
 
 #' @param n.chains The number of Markov chains to run in each unconditional fragment. Default is 2.
 
-#' @param n.warmup The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..
+#' @param n.warmup The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0.
 
-#' @param n.burnin The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument n.thin. Default is 500.
+#' @param n.burnin The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument \code{n.thin}. Default is 500.
 
-#' @param n.iters.per.chain.after.warmup.and.burnin The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument n.thin. Default is 2500.
+#' @param n.iters.per.chain.after.warmup.and.burnin The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument \code{n.thin}. Default is 2500.
 
-#' @param n.thin The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose n.burnin = 500,  n.iters.per.chain.after.warmup.and.burnin = 2500, and n.thin = 2. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.
+#' @param n.thin The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose \code{n.burnin = 500},  \code{n.iters.per.chain.after.warmup.and.burnin = 2500}, and \code{n.thin = 2}. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.
 
 #' @param n.estimation.batches The number of estimation batches when fitting
 #'   fragments that are conditional on antecedent fragments. Default is NULL, in
-#'   which case the function will divide the total number post burn-in
+#'   which case the function will divide the total number of post burn-in
 #'   iterations by 1000, effectively doing batches of 1000 iterations at a time.
 #'   Using more estimation batches leads to fewer iterations per estimation
 #'   batch. This can be helpful for reducing computational burden and run time,
 #'   and also offers future possibilities for checkpointing.
+#'
+#'   If \code{n.estimation.batches} is specified, the total number of post burn-in iterations must be a multiple of \code{n.estimation.batches}.
+#'   If left as NULL, the total number of post burn-in iterations must be a multiple of 1000 when exceeding 1000 iterations, otherwise, a single batch is used.
 
 #' @param convergence.assessment Character, indicating if convergence assessment
 #'   is desired for fragments that are not conditional on antecedents. Options
@@ -112,7 +120,7 @@ library(rlang)
 #'   down numerical summary statistics of the posterior distributions should be
 #'   saved as Word documents. Default is FALSE.
 
-#' @param digits.to.round.for.Word Numerical. Digits to round if saving results in Word documents. Only relevant if save.summary.stats.from.MUPPET.in.Word = TRUE. Default = 2.
+#' @param digits.to.round.for.Word Numerical. Digits to round if saving results in Word documents. Only relevant if \code{save.summary.stats.from.MUPPET.in.Word = TRUE}. Default = 2.
 
 #' @param save.summary.plots.from.MUPPET Character, indicating if summary plots of the posterior should be saved. Options
 #'   are: "unstandardized" to only plot
@@ -121,14 +129,27 @@ library(rlang)
 
 #' @param save.draws.from.MUPPET Logical, indicating whether the draws from fitting the MUPPET model should be written out as an output file. Default is TRUE.
 
-#' @param model.check Logical, indicating if model-data fit should be conducted. Default is FALSE. This feature was supported in earlier versions for limited classes of models. It is not currently, but is planned for future development.
-
-#' @param save.post.pred.data Logical, indicating if posterior predicted datasets from the model-data fit procedure should be
-#'   saved Default is FALSE. This feature was supported in earlier versions
-#'   for limited classes of models. It is not currently, but is planned for future
-#'   development.
-
 #' @param retain.iteration.files Logical. For conditional fragments, should the iteration-specific files be saved? Saving all these files may take up a lot of space. If set to FALSE, will still save the files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.
+
+#' @param model.check Logical, indicating if posterior predictive model checking should be conducted. Default is FALSE.
+#'
+#' In the current version, model checking is available for
+#'   univariate statistics (mean, SD, minimum, and maximum), pairwise correlations, pairwise residual
+#'   correlations, and global fit indices (Chi-square, CFI, TLI, RMSEA, and SRMR). Note that pairwise residual correlations and global
+#'   fit indices are not available for models with categorical outcomes.
+
+#' @param n.model.check.iterations Number of iterations (number of posterior predicted datasets) used in model checking. Default to use all iterations.
+
+#' @param save.post.pred.data Logical, indicating if posterior predicted datasets from the model checking procedure should be
+#'   saved. Default is FALSE.
+#'
+#' @param save.summary.stats.from.model.check Logical, indicating if numerical summaries of model checking
+#'   should be saved. Default is TRUE.
+
+#' @param save.summary.plots.from.model.check Logical, indicating if plots of model checking
+#'   should be saved. Default is TRUE.
+
+#' @param retain.model.check.iteration.files Logical. Should the iteration-specific files be saved when conducting model checking? If set to FALSE, will still save the simulation-related files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.
 
 #' @param return.R.object Logical, indicating whether to return results as an R object. Default is FALSE. This was supported in earlier versions for a limited class of models. This is not current, and should not be set to TRUE. For future development.
 
@@ -175,12 +196,15 @@ MUPPET.modular <- function(
     #   "all" to plot standardized and unstandardized parameters
     #   "none" for turning off these plots
     save.summary.plots.from.MUPPET = "unstandardized",
-
     save.draws.from.MUPPET=TRUE,
-    model.check=FALSE, # Supported in earlier versions, not current, for future development
-    save.post.pred.data=FALSE, # Supported in earlier versions, not current, for future development
-
     retain.iteration.files = FALSE,     # should we retain all the iteration specific files from Mplus
+
+    model.check=FALSE,
+    n.model.check.iterations=NULL, # Number of iterations (number of posterior predicted datasets) used in model checking. Default to use all iterations.
+    save.post.pred.data=FALSE,
+    save.summary.stats.from.model.check = TRUE,
+    save.summary.plots.from.model.check = TRUE,
+    retain.model.check.iteration.files = FALSE,
 
     return.R.object=FALSE # Supported in earlier versions, not current, for future development
 ){
@@ -258,6 +282,11 @@ MUPPET.modular <- function(
       if(is.null(fragments[[which.fragment]]$estimating.lvs)){
         fragments[[which.fragment]]$estimating.lvs = FALSE
       } #closes if argument for whether estimating latent variables is not supplied
+
+      # model.check
+      if(is.null(fragments[[which.fragment]]$model.check.this.fragment)){
+        fragments[[which.fragment]]$model.check.this.fragment = model.check
+      } #closes if argument for model checking is not supplied
 
 
     } # closes loop over fragments from the supplied list
@@ -491,7 +520,7 @@ MUPPET.modular <- function(
 
             # * * * Store and save those draws separately -----
             draws.all.parameters.Mplus <- Mplus.bparameters.after.warmup.and.burnin
-            if(save.draws.from.MUPPET) write_csv(
+            write_csv(
               draws.all.parameters.Mplus,
               paste0(fragments[[which.fragment]]$name, " draws.csv")
             )
@@ -1002,16 +1031,15 @@ MUPPET.modular <- function(
 
             } # closes if saving summary plots from MUPPET model
 
+            # Move back to home folder
+            setwd(home.folder)
+
             current.time <- Sys.time()
             print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
 
             sink("R Session Info.out", append = TRUE)
             print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
             sink()
-
-
-            # Move back to home folder
-            setwd(home.folder)
 
           } # closes if the fragment is NOT conditional on other fragments
 
@@ -1146,7 +1174,7 @@ MUPPET.modular <- function(
                           # Now whittle down the antecendent draws to hopefully leave just one column
                           whittling <- select(
                             temp.data.read.in,
-                            contains(antecedent.parameter.name.in.antecedent.draws)
+                            matches(parameter_pattern(antecedent.parameter.name.in.antecedent.draws))
                           )
 
                           whittling <- select(
@@ -1195,12 +1223,12 @@ MUPPET.modular <- function(
                         # Now whittle down the antecendent draws to hopefully leave just one column
                         whittling <- select(
                           temp.data.read.in,
-                          contains(rownames(parameter.specification)[which.variable])
+                          matches(parameter_pattern(rownames(parameter.specification)[which.variable]))
                         )
 
                         whittling <- select(
                           whittling,
-                          contains(colnames(parameter.specification)[which.other.variable])
+                          matches(parameter_pattern(colnames(parameter.specification)[which.other.variable]))
                         )
 
                         whittling <- select(
@@ -1253,7 +1281,7 @@ MUPPET.modular <- function(
                   # Now whittle down the antecendent draws to hopefully leave just one column
                   whittling <- select(
                     temp.data.read.in,
-                    contains(name.of.variable)
+                    matches(parameter_pattern(name.of.variable))
                   )
 
                   whittling <- select(
@@ -1293,7 +1321,7 @@ MUPPET.modular <- function(
                 # Now whittle down the antecendent draws to hopefully leave just one column
                 whittling <- select(
                   temp.data.read.in,
-                  contains(names.of.observables)
+                  matches(parameter_pattern(names.of.observables))
                 )
 
                 whittling <- select(
@@ -1357,7 +1385,7 @@ MUPPET.modular <- function(
                         # Now whittle down the antecendent draws to hopefully leave just one column
                         whittling <- select(
                           temp.data.read.in,
-                          contains(antecedent.parameter.name.in.antecedent.draws)
+                          matches(parameter_pattern(antecedent.parameter.name.in.antecedent.draws))
                         )
 
                         whittling <- select(
@@ -1406,12 +1434,12 @@ MUPPET.modular <- function(
                         # Now whittle down the antecendent draws to hopefully leave just one column
                         whittling <- select(
                           temp.data.read.in,
-                          contains(rownames(parameter.specification)[which.variable])
+                          matches(parameter_pattern(rownames(parameter.specification)[which.variable]))
                         )
 
                         whittling <- select(
                           whittling,
-                          contains(colnames(parameter.specification)[which.other.variable])
+                          matches(parameter_pattern(colnames(parameter.specification)[which.other.variable]))
                         )
 
                         whittling <- select(
@@ -1446,7 +1474,7 @@ MUPPET.modular <- function(
               # Now whittle down the antecendent draws to hopefully leave just one column
               whittling <- select(
                 temp.data.read.in,
-                contains(names.of.latents)
+                matches(parameter_pattern(names.of.latents))
               )
 
               whittling <- select(
@@ -1545,7 +1573,14 @@ MUPPET.modular <- function(
         # * * * Setup parallel environment ------
 
         # * * * Detect and set up the number of cores
-        numCores <- parallel::detectCores()-1
+        available_cores <- future::availableCores() # This can also be used in HPC (available cores to use)
+
+        # If using HPC then use all cores
+        if (nzchar(Sys.getenv("SLURM_CPUS_PER_TASK"))) {
+          numCores <- available_cores
+        } else {
+          numCores <- max(1L, available_cores - 1L)
+        }
 
         # strtoi works on linux
         #numCores <- strtoi(system("nproc",intern=TRUE))-1
@@ -1786,7 +1821,7 @@ MUPPET.modular <- function(
                          # Not sure why 'pull' indicates there are multiple columns, but 'select' ony yields one column
                          value.to.paste <- select(
                            unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                           contains(antecedent.parameter.name.in.antecedent.draws)
+                           matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                          )[which.iter,1]
 
                          # If the value is equal to 0, perturb it a little
@@ -1890,7 +1925,7 @@ MUPPET.modular <- function(
                            # Now whittle down the antecendent draws to hopefully leave just one column
                            whittling <- select(
                              unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                             contains(antecedent.parameter.name.in.antecedent.draws)
+                             matches(parameter_pattern(antecedent.parameter.name.in.antecedent.draws))
                            )
 
                            whittling <- select(
@@ -1912,6 +1947,12 @@ MUPPET.modular <- function(
                              whittling,
                              !contains("MEAN")
                            )
+
+                           whittling <- select(
+                             whittling,
+                             !contains("WITH")
+                           )
+
 
                            # paste the value if we've identified the isolated column
                            if(ncol(whittling) == 1) {
@@ -1990,7 +2031,7 @@ MUPPET.modular <- function(
                            if(ncol(
                              select(
                                unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                               contains(antecedent.parameter.name.in.antecedent.draws)
+                               matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                              )
                            ) == 0){
                              antecedent.parameter.name.in.antecedent.draws <- paste0(
@@ -2010,7 +2051,7 @@ MUPPET.modular <- function(
                            # Not sure why 'pull' indicates there are multiple columns, but 'select' ony yields one column
                            value.to.paste <- select(
                              unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                             contains(antecedent.parameter.name.in.antecedent.draws)
+                             matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                            )[which.iter,1]
 
 
@@ -2101,7 +2142,8 @@ MUPPET.modular <- function(
                      )
 
                      # select the draws for the intercept for this observable
-                     draws.for.intercept <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame, contains(antecedent.parameter.name.in.antecedent.draws))
+                     draws.for.intercept <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame,
+                                                   matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws)))
 
 
                      # Define the parameter name
@@ -2199,7 +2241,8 @@ MUPPET.modular <- function(
                    )
 
                    # select the draws for the thresholds for this observable
-                   draws.for.thresholds <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame, contains(antecedent.parameter.name.in.antecedent.draws))
+                   draws.for.thresholds <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame,
+                                                  contains(paste0(".", antecedent.parameter.name.in.antecedent.draws)))
 
                    # isolate the thresholds for this observable, with their parameter number
                    # do this by matching the observable name to the names of threshold parameters
@@ -2347,7 +2390,7 @@ MUPPET.modular <- function(
                          # Not sure why 'pull' indicates there are multiple columns, but 'select' ony yields one column
                          value.to.paste <- select(
                            unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                           contains(antecedent.parameter.name.in.antecedent.draws)
+                           matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                          )[which.iter,1]
 
                          # If the value is equal to 0, perturb it a little
@@ -2453,7 +2496,7 @@ MUPPET.modular <- function(
                            # Now whittle down the antecendent draws to hopefully leave just one column
                            whittling <- select(
                              unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                             contains(antecedent.parameter.name.in.antecedent.draws)
+                             matches(parameter_pattern(antecedent.parameter.name.in.antecedent.draws))
                            )
 
                            whittling <- select(
@@ -2474,6 +2517,11 @@ MUPPET.modular <- function(
                            whittling <- select(
                              whittling,
                              !contains("MEAN")
+                           )
+
+                           whittling <- select(
+                             whittling,
+                             !contains("WITH")
                            )
 
                            # paste the value if we've identified the isolated column
@@ -2553,7 +2601,7 @@ MUPPET.modular <- function(
                            if(ncol(
                              select(
                                unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                               contains(antecedent.parameter.name.in.antecedent.draws)
+                               matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                              )
                            ) == 0){
                              antecedent.parameter.name.in.antecedent.draws <- paste0(
@@ -2573,7 +2621,7 @@ MUPPET.modular <- function(
                            # Not sure why 'pull' indicates there are multiple columns, but 'select' ony yields one column
                            value.to.paste <- select(
                              unstandardized.draws.from.antecedent.fragments.as.data.frame,
-                             contains(antecedent.parameter.name.in.antecedent.draws)
+                             matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws))
                            )[which.iter,1]
 
 
@@ -2663,7 +2711,8 @@ MUPPET.modular <- function(
                    )
 
                    # select the draws for the intercept for this observable
-                   draws.for.intercept <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame, contains(antecedent.parameter.name.in.antecedent.draws))
+                   draws.for.intercept <- select(unstandardized.draws.from.antecedent.fragments.as.data.frame,
+                                                 matches(parameter_string_pattern(antecedent.parameter.name.in.antecedent.draws)))
 
 
                    # Define the parameter name
@@ -3044,6 +3093,7 @@ TYPE = PLOT3;
 
          } # closes foreach
 
+
           # Convert list to dataframe
           #draws.from.MUPPET.model.this.batch <- as.data.frame(data.table::rbindlist(draws.from.MUPPET.model.this.batch.list))
 
@@ -3137,7 +3187,6 @@ TYPE = PLOT3;
             )
             file.copy(original.file.name, new.file.name)
 
-
             # The .gh5 file
             original.file.name <-  paste0(
               fragments[[which.fragment]]$name, ".iter.1.gh5"
@@ -3159,31 +3208,17 @@ TYPE = PLOT3;
             )
             file.copy(original.file.name, new.file.name)
 
+
+            # The lvs.iter file if estimating.lvs = TRUE
+            original.file.name <-  paste0(
+              fragments[[which.fragment]]$name, " lvs.iter.1.dat"
+            )
+            new.file.name <- paste0(
+              fragment.folder,
+              fragments[[which.fragment]]$name, " lvs.iter.1.dat"
+            )
+            file.copy(original.file.name, new.file.name)
           }
-
-
-
-          # * * * Delete iteration-specific files if desired -----
-          if(!retain.iteration.files){
-
-
-            # make a copy of the first iteration, to be saved
-            file.name <- list.files(getwd(), pattern = ".iter.1.inp")
-
-            # only keep the file for this fragment
-            file.name <- file.name[grep(fragments[[which.fragment]]$name, file.name)]
-
-            # copy the file
-            file.copy(file.name, "temp.inp")
-
-            # delete files
-            to_be_deleted <- list.files(getwd(), pattern = ".iter")
-            file.remove(to_be_deleted)
-
-            # rename copy of first iteration
-            file.rename("temp.inp", file.name)
-          }
-
 
           # tidy up
           rm(draws.from.MUPPET.model.this.batch)
@@ -3233,7 +3268,7 @@ TYPE = PLOT3;
           # colnames(draws.all.parameters.Mplus)
 
           # * * * Save the draws from MUPPET for this fragment -----
-          if(save.draws.from.MUPPET) write_csv(
+          write_csv(
             # draws.all.parameters.Mplus,
             draws.from.MUPPET.model,
 
@@ -3754,16 +3789,16 @@ TYPE = PLOT3;
             )
 
           } # closes if saving summary plots from MUPPET model
+
+          # Move back to home folder
+          setwd(home.folder)
+
           current.time <- Sys.time()
           print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
 
           sink("R Session Info.out", append = TRUE)
           print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
           sink()
-
-
-          # Move back to home folder
-          setwd(home.folder)
 
 
         } # closes if NOT estimating latent variables in this fragment
@@ -3840,15 +3875,25 @@ TYPE = PLOT3;
           draws.from.MUPPET.model.this.fragment <- as.data.frame(draws.from.MUPPET.model.this.fragment)
 
           # * * * Save the draws from MUPPET for just this fragment -----
-          if(save.draws.from.MUPPET) write_csv(
+          write_csv(
             draws.from.MUPPET.model.this.fragment,
             paste0(fragments[[which.fragment]]$name, " draws.csv")
           )
 
-          # * * * Define a folder for storing output
+          # Delete the last temp file with draws from doing things in batches
+          file.name <- paste0(fragments[[which.fragment]]$name, " draws up through batch ", n.estimation.batches, ".csv")
+          if(file.exists(file.name)){
+            file.remove(file.name)
+          }
+
           current.time <- Sys.time()
           print(paste0("Posterior summary for Fragment ", which.fragment, " initiated ", round(current.time, units="secs")))
 
+          sink("R Session Info.out", append = TRUE)
+          print(paste0("Posterior summary for Fragment ", which.fragment, " initiated ", round(current.time, units="secs")))
+          sink()
+
+          # * * * Define a folder for storing output
           posterior.summary.folder <- paste0(fragment.folder, "/Summary of Posterior/")
           if(!dir.exists(posterior.summary.folder)) dir.create(posterior.summary.folder)
           setwd(posterior.summary.folder)
@@ -3877,11 +3922,16 @@ TYPE = PLOT3;
               file=file.name
             )
           } # closes if saving summary statistics from MUPPET model
-          print(paste0("Posterior summary for Fragment ", which.fragment, " completed"))
-
 
           # Move back to home folder
           setwd(home.folder)
+
+          current.time <- Sys.time()
+          print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
+
+          sink("R Session Info.out", append = TRUE)
+          print(paste0("Posterior summary for Fragment ", which.fragment, " completed ", round(current.time, units="secs")))
+          sink()
 
 
         } # closes if estimating latent variables in this fragment
@@ -3889,19 +3939,24 @@ TYPE = PLOT3;
 
         } # closes if the fragment is conditional on other fragments
 
-        # * Move fragment specific files to fragment folder -----
-
-        # Select files with the fragment name in them
-        files_to_copy <- list.files(getwd(), pattern = paste0(fragments[[which.fragment]]$name))
-
-        # Select files with a . in the filename, to avoid selecting the subfolder
-        files_to_copy <- grep("\\.", files_to_copy, value=TRUE)
-
-        # Move them
-        file.copy(files_to_copy, file.path(fragment.folder, files_to_copy))
-        rm(files_to_copy)
-
       } # closes if this fragment is to be fit
+
+
+        # Model checking for each fragment (does not matter if to.fit is TRUE or FALSE)
+        if (fragments[[which.fragment]]$model.check.this.fragment && !fragments[[which.fragment]]$estimating.lvs){
+          MUPPET.model.checking(
+            fragments = fragments,
+            which.fragment = which.fragment,
+            n.estimation.batches = n.estimation.batches,
+            iters.per.batch = iters.per.batch,
+            home.folder = home.folder,
+            n.model.check.iterations = n.model.check.iterations,
+            save.post.pred.data = save.post.pred.data,
+            save.summary.stats.from.model.check = save.summary.stats.from.model.check,
+            save.summary.plots.from.model.check = save.summary.plots.from.model.check,
+            retain.model.check.iteration.files = retain.model.check.iteration.files
+          )
+        }
 
         # * End the timer -------
         end.time <- Sys.time()
@@ -3916,6 +3971,56 @@ TYPE = PLOT3;
 
       } # closes loop over fragments (starting at 1)
 
+      # After all analyses are done, remove files if requested, and copy files to the fragment folder
+      for(which.fragment in 1:n.fragments){
+
+        if(fragments[[which.fragment]]$to.fit){
+
+          # * * * Delete iteration-specific files if desired -----
+          if(!retain.iteration.files && sum(fragments[[which.fragment]]$conditioning) != 0){
+
+            # make a copy of the first iteration, to be saved
+            file.name <- paste0(fragments[[which.fragment]]$name, ".iter.1.inp")
+
+            # copy the file
+            file.copy(file.name, "temp.inp")
+
+            # delete files
+            all.files <- list.files(getwd())
+            to_be_deleted <- all.files[
+              startsWith(all.files, paste0(fragments[[which.fragment]]$name, ".iter")) |
+              startsWith(all.files, paste0(fragments[[which.fragment]]$name, " lvs.iter"))
+            ]
+            file.remove(to_be_deleted)
+
+            # rename copy of first iteration
+            file.rename("temp.inp", file.name)
+          }
+
+          # * * * Delete files for draws if desired -----
+          if(!save.draws.from.MUPPET && !fragments[[which.fragment]]$estimating.lvs){
+            all.files <- list.files(getwd())
+            to_be_deleted <- all.files[
+              startsWith(all.files, paste0(fragments[[which.fragment]]$name, " draws"))
+            ]
+            file.remove(to_be_deleted)
+          }
+
+          # * Move fragment specific files to fragment folder -----
+
+          # Select files with the fragment name in them
+          files_to_copy <- list.files(getwd(), pattern = paste0("^",fragments[[which.fragment]]$name, "(\\.| )"))
+
+          # Select files with a . in the filename, to avoid selecting the subfolder
+          files_to_copy <- grep("\\.", files_to_copy, value=TRUE)
+
+          # Move them
+          fragment.folder <- fragments[[which.fragment]]$fragment.folder
+          file.copy(files_to_copy, file.path(fragment.folder, files_to_copy))
+          rm(files_to_copy)
+
+        }
+      }
 
      #} # closes if software.environment == Mplus
 
