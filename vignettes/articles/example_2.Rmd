@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 
-## Data Prepration
+## Data Preparation
 
 Load the package and extract the data for this example. 
 
@@ -128,7 +128,7 @@ fragment.2.specs <- list(
 
 ## Specify Fragment 3
 
-Fragment 3 is conditional on Fragment 2, and adds to it by including additional variables as indicators for one of the latent variables. Note that the syntax here also includes the specifications fixing the latent variable means and variances. These were included in Fragment 1 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 2. But the latent variable means and variances were not fitted parameters in Fragment 2. They were fixed in Fragment 2. So they will not be "brought forward" by looking at the fitted results from Fragment 2. So they need to be specified here as well. 
+Fragment 3 is conditional on Fragment 2, and adds to it by including additional variables as indicators for one of the latent variables. Note that the syntax here also includes the specifications fixing the latent variable means and variances. These were included in Fragment 2 as well, but also need to be here to preserve this constraint. In effect, the function will bring in the results for the *fitted* parameters from Fragment 2. But the latent variable means and variances were not fitted parameters in Fragment 2. They were fixed in Fragment 2. So they will not be "brought forward" by looking at the fitted results from Fragment 2. So they need to be specified here as well. 
 
 
 ```{r fragment-3-model-syntax, eval = FALSE}
@@ -162,7 +162,7 @@ fragment.3.specs <- list(
 
 ## Specify Fragment 4
 
-Fragment 4 contains the structural portion relating the latent variables from Fragment 1 to those in Fragment 3 (which were also a part of Fragment 2). The latent variables from Fragment 1 are were exogenous in that fragment, and remain so here. Accordingly, in the Mplus syntax their factor means and variances are fixed, as they were in Fragment 1. In contrast, the latent variables from Fragment 3 were exogenous in Fragment 3, but are now endogenous (being predicted by the latent variables from Fragment 1). Accordingly, Even though their means and variances were fixed in Fragment 3, those parameters are now functions of other parameters, and we estimate intercepts and latent disturbance variances for those latent variables as part of the structural model. Note also that the correlation between the latent disturbances is part of the fitted model here. This is for the same reason.  
+Fragment 4 contains the structural portion relating the latent variables from Fragment 1 to those in Fragment 3 (which were also a part of Fragment 2). The latent variables from Fragment 1 were exogenous in that fragment, and remain so here. Accordingly, in the Mplus syntax their factor means and variances are fixed, as they were in Fragment 1. In contrast, the latent variables from Fragment 3 were exogenous in Fragment 3, but are now endogenous (being predicted by the latent variables from Fragment 1). Accordingly, Even though their means and variances were fixed in Fragment 3, those parameters are now functions of other parameters, and we estimate intercepts and latent disturbance variances for those latent variables as part of the structural model. Note also that the correlation between the latent disturbances is part of the fitted model here. This is for the same reason.  
 
 ```{r fragment-4-model-syntax, eval = FALSE}
 Mplus.MODEL.syntax.fragment.4 <- "
@@ -190,7 +190,7 @@ Mplus.MODEL.syntax.fragment.4 <- "
   "
 ```
 
-Now define the specifications for the fragment. The first key element here is `conditioning = c(1,2,3)`. This communicates that Fragment 4 is conditional on Fragments 1, 2, and 3. The next key element here is `parameters.to.exclude.in.conditioning`. This is a list with 3 entries, corresponding to the 3 fragments that we are conditioning on. The entries in the list express which parameters from that antecedent fragment to ignore (i.e., not carry forward to Fragment 4). In this example, we want to carry forward all the fitted parameters from Fragment 1, so the first element in the list is `none`. But we do want to ignore some of the fitted parameters from Fragment 2 and 3. In particular, we want to ignore the fitted covariances among the latent variables in those fragments, because those fragments are now endogenous, and we wish to estimate their latent disturbance covariance, as mentioned above. . 
+Now define the specifications for the fragment. The first key element here is `conditioning = c(1,2,3)`. This communicates that Fragment 4 is conditional on Fragments 1, 2, and 3. The next key element here is `parameters.to.exclude.in.conditioning`. This is a list with 3 entries, corresponding to the 3 fragments that we are conditioning on. The entries in the list express which parameters from that antecedent fragment to ignore (i.e., not carry forward to Fragment 4). In this example, we want to carry forward all the fitted parameters from Fragment 1, so the first element in the list is `none`. But we do want to ignore some of the fitted parameters from Fragment 2 and 3. In particular, we want to ignore the fitted covariances among the latent variables in those fragments, because those fragments are now endogenous, and we wish to estimate their latent disturbance covariance, as mentioned above.  
 
 
 ```{r fragment-4-specifications, eval = FALSE}

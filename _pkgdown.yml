@@ -32,4 +32,16 @@ articles:
   - articles/example_3
   - articles/example_4
 
+reference:
+  - title: "Main Function"
+    contents:
+      - MUPPET.modular
 
+  - title: "Internal Functions"
+    contents:
+      - MUPPET.model.checking
+      - df_to_mcmc_list
+      - mcmcplot.mod
+      - model.checking.plot
+      - pairwise.correlation
+      - residual.cor.reorder

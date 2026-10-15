@@ -18,9 +18,13 @@ MUPPET.modular(
   digits.to.round.for.Word = 2,
   save.summary.plots.from.MUPPET = "unstandardized",
   save.draws.from.MUPPET = TRUE,
-  model.check = FALSE,
-  save.post.pred.data = FALSE,
   retain.iteration.files = FALSE,
+  model.check = FALSE,
+  n.model.check.iterations = NULL,
+  save.post.pred.data = FALSE,
+  save.summary.stats.from.model.check = TRUE,
+  save.summary.plots.from.model.check = TRUE,
+  retain.model.check.iteration.files = FALSE,
   return.R.object = FALSE
 )
 }
@@ -42,7 +46,7 @@ MUPPET.modular(
  conditional on the first fragment in the fragments list; a value of c(1, 2)
  indicates the fragment is conditional on fragment 1 and fragment 2 in the
  fragments list.}
- \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for pkg{conditioning}).
+ \item{parameters.to.exclude.in.conditioning: A list, of length equal to the number of fragments that are conditioned on (i.e., the length of the collection supplied as the argument for \code{conditioning}).
  Each element of the list is a character, or character vector, naming the kinds of parameters from the associated antecedent fragment that should be ignored in fitting this fragment.
  Possible values are:
 
@@ -57,39 +61,47 @@ MUPPET.modular(
    \item "means and intercepts of latent variables"
  }
  A value of "none" indicates that all fitted parameters from the antecedent
- fragment should be conditioned on. For example, if pkg{conditioning} = c(1,2),
- and pkg{parameters.to.exclude.in.conditioning} = list("none", c("(co)variances of
- latent variables", "means and intercepts of latent variables")),then none of
+ fragment should be conditioned on. For example, if \code{conditioning = c(1,2)},
+ and \code{parameters.to.exclude.in.conditioning = list("none", c("(co)variances of
+ latent variables", "means and intercepts of latent variables"))}, then none of
  the parameters from fragment 1 will be ignored, while there will be
  parameters from fragment 2 that are ignored. These parameters include the
  (co)variances of latent variables and the means and intercepts of latent
  variables.
 
- If no value for pkg{parameters.to.exclude.in.conditioning}is supplied, the default is "none" for all antecedent fragments.
+ If no value for \code{parameters.to.exclude.in.conditioning} is supplied, the default is "none" for all antecedent fragments.
  }
 
  \item{to.fit: Logical, indicating if this fragment should be fit. If no value is supplied, defaults to TRUE. If value is FALSE, the fragment will not be fit. This can be useful when a fragment has previously been fit, and is now being used as an antecdent to another fragment.}
- \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.}
+ \item{estimating.lvs: Logical, indicating if this fragment pertains to estimating latent variable values. Default is FALSE. But using default may be finicky, so recommend specifying explicitly.
+
+ \code{estimating.lvs = TRUE} should not be specified for unconditional fragment.}
  \item{data: The dataset to use in fitting this fragment.}
+ \item{model.check.this.fragment: Logical, indicating if model checking should be conducted for this fragment.
+ If no value is supplied, defaults to the value of \code{model.check}.
+ Model checking is only available when \code{estimating.lvs = FALSE}.}
 }}
 
 \item{n.chains}{The number of Markov chains to run in each unconditional fragment. Default is 2.}
 
-\item{n.warmup}{The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0..}
+\item{n.warmup}{The number of warmup iterations used by the Markov chains. This is applicable for stan and related software. Not needed, and need not be specified, when using Mplus. Default is 0.}
 
-\item{n.burnin}{The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument n.thin. Default is 500.}
+\item{n.burnin}{The number of iterations to discard as burn-in iterations for the Markov chains. See also the argument \code{n.thin}. Default is 500.}
 
-\item{n.iters.per.chain.after.warmup.and.burnin}{The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument n.thin. Default is 2500.}
+\item{n.iters.per.chain.after.warmup.and.burnin}{The number of iterations desired, for each chain, after any warmup or burn-in period. See also the argument \code{n.thin}. Default is 2500.}
 
-\item{n.thin}{The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose n.burnin = 500,  n.iters.per.chain.after.warmup.and.burnin = 2500, and n.thin = 2. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.}
+\item{n.thin}{The thinning parameter, for each Markov chain. Importantly, when using Mplus, this applies to all iterations. For example, suppose \code{n.burnin = 500},  \code{n.iters.per.chain.after.warmup.and.burnin = 2500}, and \code{n.thin = 2}. This effectively instructs Mplus to run 1000 iterations as burn-in (i.e., 1000 iterations thinned by 2 is 500) and 5000 iterations after burn-in (i.e., 5000 iterations thinned by 2 is 2500). Default is 1.}
 
 \item{n.estimation.batches}{The number of estimation batches when fitting
-fragments that are conditional on antecedent fragments. Default is NULL, in
-which case the function will divide the total number post burn-in
-iterations by 1000, effectively doing batches of 1000 iterations at a time.
-Using more estimation batches leads to fewer iterations per estimation
-batch. This can be helpful for reducing computational burden and run time,
-and also offers future possibilities for checkpointing.}
+  fragments that are conditional on antecedent fragments. Default is NULL, in
+  which case the function will divide the total number of post burn-in
+  iterations by 1000, effectively doing batches of 1000 iterations at a time.
+  Using more estimation batches leads to fewer iterations per estimation
+  batch. This can be helpful for reducing computational burden and run time,
+  and also offers future possibilities for checkpointing.
+
+  If \code{n.estimation.batches} is specified, the total number of post burn-in iterations must be a multiple of \code{n.estimation.batches}.
+  If left as NULL, the total number of post burn-in iterations must be a multiple of 1000 when exceeding 1000 iterations, otherwise, a single batch is used.}
 
 \item{convergence.assessment}{Character, indicating if convergence assessment
 is desired for fragments that are not conditional on antecedents. Options
@@ -105,7 +117,7 @@ summaries of posterior distributions be saved. Default is TRUE.}
 down numerical summary statistics of the posterior distributions should be
 saved as Word documents. Default is FALSE.}
 
-\item{digits.to.round.for.Word}{Numerical. Digits to round if saving results in Word documents. Only relevant if save.summary.stats.from.MUPPET.in.Word = TRUE. Default = 2.}
+\item{digits.to.round.for.Word}{Numerical. Digits to round if saving results in Word documents. Only relevant if \code{save.summary.stats.from.MUPPET.in.Word = TRUE}. Default = 2.}
 
 \item{save.summary.plots.from.MUPPET}{Character, indicating if summary plots of the posterior should be saved. Options
 are: "unstandardized" to only plot
@@ -114,14 +126,27 @@ parameters, "none" for turning off these plots. Default is "unstandardized".}
 
 \item{save.draws.from.MUPPET}{Logical, indicating whether the draws from fitting the MUPPET model should be written out as an output file. Default is TRUE.}
 
-\item{model.check}{Logical, indicating if model-data fit should be conducted. Default is FALSE. This feature was supported in earlier versions for limited classes of models. It is not currently, but is planned for future development.}
-
-\item{save.post.pred.data}{Logical, indicating if posterior predicted datasets from the model-data fit procedure should be
-saved Default is FALSE. This feature was supported in earlier versions
-for limited classes of models. It is not currently, but is planned for future
-development.}
-
 \item{retain.iteration.files}{Logical. For conditional fragments, should the iteration-specific files be saved? Saving all these files may take up a lot of space. If set to FALSE, will still save the files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.}
+
+\item{model.check}{Logical, indicating if posterior predictive model checking should be conducted. Default is FALSE.
+
+In the current version, model checking is available for
+  univariate statistics (mean, SD, minimum, and maximum), pairwise correlations, pairwise residual
+  correlations, and global fit indices (Chi-square, CFI, TLI, RMSEA, and SRMR). Note that pairwise residual correlations and global
+  fit indices are not available for models with categorical outcomes.}
+
+\item{n.model.check.iterations}{Number of iterations (number of posterior predicted datasets) used in model checking. Default to use all iterations.}
+
+\item{save.post.pred.data}{Logical, indicating if posterior predicted datasets from the model checking procedure should be
+saved. Default is FALSE.}
+
+\item{save.summary.stats.from.model.check}{Logical, indicating if numerical summaries of model checking
+should be saved. Default is TRUE.}
+
+\item{save.summary.plots.from.model.check}{Logical, indicating if plots of model checking
+should be saved. Default is TRUE.}
+
+\item{retain.model.check.iteration.files}{Logical. Should the iteration-specific files be saved when conducting model checking? If set to FALSE, will still save the simulation-related files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.}
 
 \item{return.R.object}{Logical, indicating whether to return results as an R object. Default is FALSE. This was supported in earlier versions for a limited class of models. This is not current, and should not be set to TRUE. For future development.}
 }

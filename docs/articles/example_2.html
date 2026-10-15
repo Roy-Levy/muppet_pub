@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>SEM with Multiple Latent Variables, in 4 Fragments • muppet</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Roboto-0.4.7/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Roboto-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="SEM with Multiple Latent Variables, in 4 Fragments">
 <style>
 .pkgdown-footer-left { display: none; }
@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muppet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@ Fragment 4 is a structural model relating the latent variables from
 Fragment 1 to the latent variables in Fragment 3 (and 2).</p>
 </div>
 <div class="section level2">
-<h2 id="data-prepration">Data Prepration<a class="anchor" aria-label="anchor" href="#data-prepration"></a>
+<h2 id="data-preparation">Data Preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h2>
 <p>Load the package and extract the data for this example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -192,7 +192,7 @@ the argument that <code>conditioning = 0</code>.</p>
 <p>Fragment 3 is conditional on Fragment 2, and adds to it by including
 additional variables as indicators for one of the latent variables. Note
 that the syntax here also includes the specifications fixing the latent
-variable means and variances. These were included in Fragment 1 as well,
+variable means and variances. These were included in Fragment 2 as well,
 but also need to be here to preserve this constraint. In effect, the
 function will bring in the results for the <em>fitted</em> parameters
 from Fragment 2. But the latent variable means and variances were not
@@ -232,8 +232,8 @@ are instructing the functions to condition on the results from Fragment
 </h2>
 <p>Fragment 4 contains the structural portion relating the latent
 variables from Fragment 1 to those in Fragment 3 (which were also a part
-of Fragment 2). The latent variables from Fragment 1 are were exogenous
-in that fragment, and remain so here. Accordingly, in the Mplus syntax
+of Fragment 2). The latent variables from Fragment 1 were exogenous in
+that fragment, and remain so here. Accordingly, in the Mplus syntax
 their factor means and variances are fixed, as they were in Fragment 1.
 In contrast, the latent variables from Fragment 3 were exogenous in
 Fragment 3, but are now endogenous (being predicted by the latent
@@ -280,7 +280,7 @@ But we do want to ignore some of the fitted parameters from Fragment 2
 and 3. In particular, we want to ignore the fitted covariances among the
 latent variables in those fragments, because those fragments are now
 endogenous, and we wish to estimate their latent disturbance covariance,
-as mentioned above. .</p>
+as mentioned above.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fragment.4.specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"Working Memory Predict Word Learning"</span>,</span>
@@ -327,11 +327,11 @@ will write out output files.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Roy Levy.</p>
+  <p>Developed by Roy Levy, Yadi Li.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

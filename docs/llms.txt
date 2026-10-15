@@ -1,0 +1,82 @@
+## Overview
+
+The `muppet` package executes Measurement and Uncertainty Preserving
+ParamETric (MUPPET) modeling. MUPPET is a modular approach to model
+fitting, using Bayesian approaches to modeling and estimation. Models
+and analyses are conceived of in terms of fragments. Each may be fit to
+data or analyzed, possibly conditional on antecedent fragments. In that
+case, the results from the antecedent fragments are carried forward to
+those that depend on them.
+
+## Installation
+
+You can install the current public version of `muppet` from GitHub. It
+depends on other packages for certain fuctionality. `muppet` uses
+functions that are part of the `mcmcplots` package, developed by S.
+McKay Curtis, to plot results from the chains. However, `mcmcplots` is
+no longer availabe on CRAN. A verion of `mcmcplots` may be installed
+from GitHub, and then `muppet` can also be installed from GitHub. This
+may be done as follows:
+
+``` r
+
+# install.packages("remotes")  # if you don't have remotes installed
+
+# Install mcmcplots from maintained fork
+remotes::install_github("Roy-Levy/mcmcplots")
+
+# Then install muppet
+remotes::install_github("Roy-Levy/muppet_pub")
+```
+
+## Examples
+
+The [Examples and
+Tips](https://roy-levy.github.io/muppet_pub/articles/index.html) page
+has some examples and explanations of some of the basic functionality.
+
+## Contact
+
+Have questions or suggestions for features? Found a bug? Please contact
+me at <Roy.Levy@asu.edu>
+
+# Package index
+
+## Main Function
+
+- [`MUPPET.modular()`](https://roy-levy.github.io/muppet_pub/reference/MUPPET.modular.md)
+  : MUPPET Analysis
+
+## Internal Functions
+
+- [`MUPPET.model.checking()`](https://roy-levy.github.io/muppet_pub/reference/MUPPET.model.checking.md)
+  : MUPPET Model Checking
+- [`df_to_mcmc_list()`](https://roy-levy.github.io/muppet_pub/reference/df_to_mcmc_list.md)
+  : Converts a dataframe to an mcmc.list object
+- [`mcmcplot.mod()`](https://roy-levy.github.io/muppet_pub/reference/mcmcplot.mod.md)
+  : Plot MCMC draws
+- [`model.checking.plot()`](https://roy-levy.github.io/muppet_pub/reference/model.check.plots.md)
+  [`model.checking.cor.plot()`](https://roy-levy.github.io/muppet_pub/reference/model.check.plots.md)
+  [`model.checking.res.cor.plot()`](https://roy-levy.github.io/muppet_pub/reference/model.check.plots.md)
+  [`model.checking.fit.plot()`](https://roy-levy.github.io/muppet_pub/reference/model.check.plots.md)
+  [`ppp.plot()`](https://roy-levy.github.io/muppet_pub/reference/model.check.plots.md)
+  : MUPPET Model Checking Plotting Functions
+- [`pairwise.correlation()`](https://roy-levy.github.io/muppet_pub/reference/pairwise.correlation.md)
+  : Process Pairwise Correlations
+- [`residual.cor.reorder()`](https://roy-levy.github.io/muppet_pub/reference/residual.cor.reorder.md)
+  : Process Residual Correlations
+
+# Articles
+
+### Examples and Tips
+
+- [Tips for Using the Software to conduct MUPPET
+  Modeling](https://roy-levy.github.io/muppet_pub/articles/tips.md):
+- [SEM with 1 Latent Variable and 1 Outcome, in 2
+  Fragments](https://roy-levy.github.io/muppet_pub/articles/example_1.md):
+- [SEM with Multiple Latent Variables, in 4
+  Fragments](https://roy-levy.github.io/muppet_pub/articles/example_2.md):
+- [IRT Calibration, In-Sample Scoring, & Out-Of-Sample Scoring, in 3
+  Fragments](https://roy-levy.github.io/muppet_pub/articles/example_3.md):
+- [IRT Calibration of Additional Items, in 3
+  Fragments](https://roy-levy.github.io/muppet_pub/articles/example_4.md):

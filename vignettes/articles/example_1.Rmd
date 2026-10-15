@@ -1,7 +1,7 @@
 ---
 title: "SEM with 1 Latent Variable and 1 Outcome, in 2 Fragments"
 output: html_document
-date: "2025-08-22"
+date: "2026-10-14"
 ---
 
 ## Overview
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 
-## Data Prepration
+## Data Preparation
 
 Load the package and extract the data for this example. 
 
@@ -119,3 +119,22 @@ MUPPET.modular(
   save.summary.plots.from.MUPPET = "none"
 )
 ```
+
+## Conduct Model Checking
+
+Posterior predictive model checking can be conducted by setting `model.check = TRUE`. The code below demonstrates this using the same model specifications as above. Running this code will write out output files containing model checking results.
+
+```{r model-checking, eval = FALSE}
+MUPPET.modular(
+  fragments = list(fragment.1.specs, fragment.2.specs),
+  n.chains = 2,
+  n.warmup = 0,
+  n.burnin = 500,
+  n.iters.per.chain.after.warmup.and.burnin = 100,
+  n.estimation.batches = 25,
+  convergence.assessment = "none",
+  save.summary.plots.from.MUPPET = "none",
+  model.check = TRUE
+)
+```
+
