@@ -168,6 +168,28 @@ MUPPET.model.checking <- function(
       input_cor_df
     )
 
+  # Set up number of iterations (number of posterior predicted datasets) used in model checking
+  n.total.iterations <- n.estimation.batches * iters.per.batch
+
+  if (is.null(n.model.check.iterations)){
+    n.model.check.iterations <- n.total.iterations
+  }
+
+  if (n.model.check.iterations > n.total.iterations){
+    warning("Requested number of model checking iterations exceeds the total number of iterations. Using all available iterations.")
+    n.model.check.iterations <- n.total.iterations
+  }
+
+  # If not all iterations are used, space out the iterations
+  # This does not require n.total.iterations to be divisible by n.model.check.iterations
+  model.check.iteration.indices <- floor(
+    seq(
+      0,
+      n.total.iterations,
+      length.out = n.model.check.iterations + 1
+    )
+  )[-1]
+
   #######################################
   # If need to generate posterior predicted data
   if (need.generate.post.pred.data){
@@ -207,12 +229,6 @@ MUPPET.model.checking <- function(
     # Set working directory to the model checking folder
     setwd(model.checking.folder)
 
-    # * * * Clean up existing parallel environment ------
-    unregister_dopar <- function() {
-      env <- foreach:::.foreachGlobals
-      rm(list = ls(name = env), pos = env)
-    }
-
     # * * * Setup parallel environment ------
 
     # * * * Detect and set up the number of cores
@@ -225,20 +241,40 @@ MUPPET.model.checking <- function(
       numCores <- max(1L, available_cores - 1L)
     }
 
+    # Clean up any existing implicit cluster
+    doParallel::stopImplicitCluster()
+    # Register parallel back end for model checking
     registerDoParallel(numCores)
 
+    ######################################
     # * * * Loop over estimation batches ------
     for(which.estimation.batch in 1:n.estimation.batches){
+
+      current.time <- Sys.time()
+      print(paste0("Started Fragment ", which.fragment, " model checking batch ", which.estimation.batch, " of ", n.estimation.batches, " ", round(current.time, units="secs")))
+
+      sink(file.path(home.folder, "R Session Info.out"), append = TRUE)
+      print(paste0("Started Fragment ", which.fragment, " model checking batch ", which.estimation.batch, " of ", n.estimation.batches, " ", round(current.time, units="secs")))
+      sink()
 
       # Define the start and end iteration for each batch
       start.iter = (which.estimation.batch-1)*iters.per.batch + 1
       end.iter = (which.estimation.batch-1)*iters.per.batch + iters.per.batch
 
+      # Select only model checking iterations within this batch
+      batch.iteration.indices <- model.check.iteration.indices[
+        model.check.iteration.indices >= start.iter &
+          model.check.iteration.indices <= end.iter
+      ]
+
+      # Skip batches with no selected iterations
+      if(length(batch.iteration.indices) == 0) next
+
+
       # Loop through each iteration
       foreach(
-        which.iter = start.iter:end.iter,
-        .packages = c("dplyr", "MplusAutomation"),
-        .combine = rbind
+        which.iter = batch.iteration.indices,
+        .packages = c("dplyr", "MplusAutomation")
       ) %dopar%
         {
           which.iter = as.integer(which.iter)
@@ -1017,6 +1053,14 @@ MUPPET.model.checking <- function(
 
           } # For continuous variables only
         } # Closes loop over each iteration in a batch
+
+        current.time <- Sys.time()
+        print(paste0("Completed Fragment ", which.fragment, " model checking batch ", which.estimation.batch, " of ", n.estimation.batches, " ", round(current.time, units="secs")))
+
+        sink(file.path(home.folder, "R Session Info.out"), append = TRUE)
+        print(paste0("Completed Fragment ", which.fragment, " model checking batch ", which.estimation.batch, " of ", n.estimation.batches, " ", round(current.time, units="secs")))
+        sink()
+
     } # Closes loop over estimation batches
   } # Ends the process of simulating data
 
@@ -1028,51 +1072,10 @@ MUPPET.model.checking <- function(
   #################################
   # Calculate summary statistics on simulated data
 
-  # Set up number of iterations (number of posterior predicted datasets) used in model checking
-  n.total.iterations <- n.estimation.batches * iters.per.batch
-
-  if (is.null(n.model.check.iterations)){
-    n.model.check.iterations <- n.total.iterations
-  }
-
-  if (n.model.check.iterations > n.total.iterations){
-    warning("Requested number of model checking iterations exceeds the total number of iterations. Using all available iterations.")
-    n.model.check.iterations <- n.total.iterations
-  }
-
-  # If not all iterations are used, space out the iterations
-  # This does not require n.total.iterations to be divisible by n.model.check.iterations
-  model.check.iteration.indices <- floor(
-    seq(
-      0,
-      n.total.iterations,
-      length.out = n.model.check.iterations + 1
-    )
-  )[-1]
-
-
-  # Set up a list to store the summary data
-  summary.simulate.data.list <- vector(
-    "list",
-    length = n.model.check.iterations
-  )
-
-  if (is.null(categorical_variable_syntax)){
-    # Set up a list to store realized values of fit statistics
-    real.fit.list <- vector(
-      "list",
-      length = n.model.check.iterations
-    )
-    # Set up a list to store posterior predictive values of fit statistics
-    pred.fit.list <- vector(
-      "list",
-      length = n.model.check.iterations
-    )
-  } # For continuous variables only
-
-
-
-  for(which.iter in model.check.iteration.indices){
+  summary.results <- foreach(
+    which.iter = model.check.iteration.indices,
+    .packages = c("dplyr", "MplusAutomation")
+  ) %dopar% {
 
     # * * * * Read in the simulated data and calculate statistics ------------
     simulate.data <- read.table(
@@ -1088,11 +1091,10 @@ MUPPET.model.checking <- function(
       )
 
     # Pairwise correlations
-    cor_result <- pairwise.correlation(simulate.data)
-    cor_df <- as.data.frame(as.list(cor_result))
+    cor_df <- as.data.frame(as.list(pairwise.correlation(simulate.data)))
 
     # Univariate statistics and pairwise correlations
-    summary.simulate.data.list[[which.iter]] <-
+    summary.simulate.data <-
       bind_cols(
         summary.simulate.data.univariate,
         cor_df
@@ -1192,24 +1194,35 @@ MUPPET.model.checking <- function(
         )))
 
       # Realized values of fit statistics
-      real.fit.list[[which.iter]] <- bind_cols(
+      real.fit <- bind_cols(
         real_res_cor_df,
         real_fit_df
       )
 
       # Posterior predictive values of fit statistics
-      pred.fit.list[[which.iter]] <- bind_cols(
+      pred.fit <- bind_cols(
         pred_res_cor_df,
         pred_fit_df
       )
 
     } # For continuous variables only
+
+    # Return results
+    list(
+      summary.simulate.data = summary.simulate.data,
+      real.fit = if (is.null(categorical_variable_syntax)) real.fit else NULL,
+      pred.fit = if (is.null(categorical_variable_syntax)) pred.fit else NULL
+    )
+
   } # Closes loop over each iteration
 
+  # * * * Clean up parallel environment ------
+  doParallel::stopImplicitCluster()
+  foreach::registerDoSEQ()
 
   # Summary statistics for simulated data, of all iterations
   summary.simulate.data <- bind_rows(
-    summary.simulate.data.list
+    lapply(summary.results, `[[`, "summary.simulate.data")
   )
 
   # Ensure that we only report those statistics applicable to the input data
@@ -1224,11 +1237,11 @@ MUPPET.model.checking <- function(
 
     # Realized values of fit statistics, of all iterations
     real.fit <- bind_rows(
-      real.fit.list
+      lapply(summary.results, `[[`, "real.fit")
     )
     # Posterior predictive values of fit statistics, of all iterations
     pred.fit <- bind_rows(
-      pred.fit.list
+      lapply(summary.results, `[[`, "pred.fit")
     )
 
     # Combine the above two in one data frame
@@ -1608,8 +1621,12 @@ MUPPET.model.checking <- function(
   # * * * Delete iteration-specific files if desired -----
   if(need.generate.post.pred.data && !retain.model.check.iteration.files){
 
+    # Make a copy of the first model-checking iteration, to be saved
+    first.iter <- model.check.iteration.indices[1]
+
     # make a copy of the first iteration, to be saved
-    file.name <- list.files(getwd(), pattern = "\\.iter\\.1\\.")
+    file.name <- list.files(getwd(),
+                            pattern = paste0("\\.iter\\.", first.iter, "\\."))
 
     temp.file.name <- paste0("temp_", seq_along(file.name))
 

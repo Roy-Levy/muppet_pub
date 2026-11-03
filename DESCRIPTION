@@ -1,7 +1,7 @@
 Package: muppet
 Type: Package
 Title: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Roy", "Levy", , "Roy.Levy@asu.edu", role = c("aut", "cre")),
     person("Karina", "Cahill", role = "ctb"),
@@ -29,6 +29,7 @@ Imports:
     Hmisc,
     tinytable,
     ggplot2,
-    future
+    future,
+    tidyr
 URL: https://roy-levy.github.io/muppet_pub/
 Config/roxygen2/version: 8.0.0
