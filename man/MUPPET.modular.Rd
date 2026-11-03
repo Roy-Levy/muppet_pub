@@ -135,7 +135,9 @@ In the current version, model checking is available for
   correlations, and global fit indices (Chi-square, CFI, TLI, RMSEA, and SRMR). Note that pairwise residual correlations and global
   fit indices are not available for models with categorical outcomes.}
 
-\item{n.model.check.iterations}{Number of iterations (number of posterior predicted datasets) used in model checking. Default to use all iterations.}
+\item{n.model.check.iterations}{Number of iterations (number of posterior predicted datasets) used in model checking.
+Iterations are selected at approximately equal intervals across all post burn-in iterations. For example, if there are a total of 100 post burn-in iterations and \code{n.model.check.iterations = 10}, then iterations 10, 20, 30, ..., 100 will be selected.
+Default to use all iterations.}
 
 \item{save.post.pred.data}{Logical, indicating if posterior predicted datasets from the model checking procedure should be
 saved. Default is FALSE.}
@@ -146,7 +148,7 @@ should be saved. Default is TRUE.}
 \item{save.summary.plots.from.model.check}{Logical, indicating if plots of model checking
 should be saved. Default is TRUE.}
 
-\item{retain.model.check.iteration.files}{Logical. Should the iteration-specific files be saved when conducting model checking? If set to FALSE, will still save the simulation-related files for iteration 1, which may be useful for troubleshooting if needed. Default is FALSE.}
+\item{retain.model.check.iteration.files}{Logical. Should the iteration-specific files be saved when conducting model checking? If FALSE, only the simulation-related files from the first iteration used for model checking are retained for troubleshooting. Default is FALSE.}
 
 \item{return.R.object}{Logical, indicating whether to return results as an R object. Default is FALSE. This was supported in earlier versions for a limited class of models. This is not current, and should not be set to TRUE. For future development.}
 }
