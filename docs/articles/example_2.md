@@ -16,7 +16,6 @@ Fragment 1 to the latent variables in Fragment 3 (and 2).
 Load the package and extract the data for this example.
 
 ``` r
-
 library(muppet)
 data(sim.POWER, package = "muppet")
 data.for.mplus <- sim.POWER.data
@@ -31,7 +30,6 @@ the categorical variables. If you’re using a variable with 10 or more
 thresholds, you will likely need an even shorter variable name.)
 
 ``` r
-
 # * Check if any column names are more than 8 characters
 if(!all(nchar(colnames(data.for.mplus)) <= 8)){
   print("Do not proceed. Rename Mplus variables to have <= 8 characters")
@@ -47,7 +45,6 @@ variables. All the latent variable means and variances are fixed, and
 all the loadings and intercepts are estimated.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.1 <- "
   ! Working Memory Factor Model
   ! Central Executive
@@ -79,7 +76,6 @@ Now define the specifications for the fragment. In this list we are
 passing along the syntax and data from above.
 
 ``` r
-
 fragment.1.specs <- list(
   name = "Working Memory Measurement Model",
   model.syntax = Mplus.MODEL.syntax.fragment.1,
@@ -97,7 +93,6 @@ variances for the (2) latent variables are fixed, and the loadings and
 intercepts are estimated.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.2 <- "
     ! Word Learning Factor Model
 
@@ -131,7 +126,6 @@ is Fragment 2, it is not conditional on Fragment 1. This is expressed by
 the argument that `conditioning = 0`.
 
 ``` r
-
 fragment.2.specs <- list(
   name = "Word Learning Measurement Model",
   model.syntax = Mplus.MODEL.syntax.fragment.2,
@@ -154,7 +148,6 @@ not be “brought forward” by looking at the fitted results from Fragment
 2. So they need to be specified here as well.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.3 <- "
   ! Word Learning Factor Model
 
@@ -177,7 +170,6 @@ setting `conditioning = 2` in this list of specifications, we are
 instructing the functions to condition on the results from Fragment 2.
 
 ``` r
-
 fragment.3.specs <- list(
   name = "Including More Word Learning Indicators",
   model.syntax = Mplus.MODEL.syntax.fragment.3,
@@ -203,7 +195,6 @@ Note also that the correlation between the latent disturbances is part
 of the fitted model here. This is for the same reason.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.4 <- "
 
   ! Structural relations
@@ -245,7 +236,6 @@ endogenous, and we wish to estimate their latent disturbance covariance,
 as mentioned above.
 
 ``` r
-
 fragment.4.specs <- list(
   name = "Working Memory Predict Word Learning",
   model.syntax = Mplus.MODEL.syntax.fragment.4,
@@ -273,7 +263,6 @@ above. The rest of the arguments communicate specifications for running
 MCMC and saving output. Running this code will write out output files.
 
 ``` r
-
 MUPPET.modular(
   fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs, fragment.4.specs),
   n.chains = 2,

@@ -1,5 +1,12 @@
 # Changelog
 
+## muppet 0.2.1
+
+### New features
+
+- Added option to use a subset of posterior draws for posterior
+  predictive model checking.
+
 ## muppet 0.2.0
 
 ### New features

@@ -144,7 +144,11 @@ MUPPET.model.checking(
 - n.model.check.iterations:
 
   Number of iterations (number of posterior predicted datasets) used in
-  model checking. Default to use all iterations.
+  model checking. Iterations are selected at approximately equal
+  intervals across all post burn-in iterations. For example, if there
+  are a total of 100 post burn-in iterations and
+  `n.model.check.iterations = 10`, then iterations 10, 20, 30, ..., 100
+  will be selected. Default to use all iterations.
 
 - save.post.pred.data:
 
@@ -164,9 +168,9 @@ MUPPET.model.checking(
 - retain.model.check.iteration.files:
 
   Logical. Should the iteration-specific files be saved when conducting
-  model checking? If set to FALSE, will still save the
-  simulation-related files for iteration 1, which may be useful for
-  troubleshooting if needed. Default is FALSE.
+  model checking? If FALSE, only the simulation-related files from the
+  first iteration used for model checking are retained for
+  troubleshooting. Default is FALSE.
 
 ## Value
 

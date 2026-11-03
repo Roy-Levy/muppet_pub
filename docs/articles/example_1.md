@@ -14,7 +14,6 @@ relating the latent variable to the outcome.
 Load the package and extract the data for this example.
 
 ``` r
-
 library(muppet)
 data(one.factor.interpr.confound, package = "muppet")
 data.for.mplus <- one.factor.interpr.confound.data
@@ -29,7 +28,6 @@ the categorical variables. If you’re using a variable with 10 or more
 thresholds, you will likely need an even shorter variable name.)
 
 ``` r
-
 # * Check if any column names are more than 8 characters
 if(!all(nchar(colnames(data.for.mplus)) <= 8)){
   print("Do not proceed. Rename Mplus variables to have <= 8 characters")
@@ -45,7 +43,6 @@ mean and variance are fixed, and all the loadings and intercepts are
 estimated.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.1 <- "
  ! Factor Model
  F1 by x1-x4*;
@@ -65,7 +62,6 @@ passing along the syntax and data from above. By setting
 fragment without conditioning on any other fragment.
 
 ``` r
-
 fragment.1.specs <- list(
   name = "Measurement Model",
   model.syntax = Mplus.MODEL.syntax.fragment.1,
@@ -88,7 +84,6 @@ fitted results from Fragment 1. So they need to be specified here as
 well.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.2 <- "
 
 ! Structural relations
@@ -111,7 +106,6 @@ passing along the syntax and data, as we did for Fragment 1. By setting
 the functions to condition on the results from Fragment 1.
 
 ``` r
-
 fragment.2.specs <- list(
   name = "Structural Model With an Outcome",
   model.syntax = Mplus.MODEL.syntax.fragment.2,
@@ -128,7 +122,6 @@ above. The rest of the arguments communicate specifications for running
 MCMC and saving output. Running this code will write out output files.
 
 ``` r
-
 MUPPET.modular(
   fragments = list(fragment.1.specs, fragment.2.specs),
   n.chains = 2,
@@ -149,7 +142,6 @@ model specifications as above. Running this code will write out output
 files containing model checking results.
 
 ``` r
-
 MUPPET.modular(
   fragments = list(fragment.1.specs, fragment.2.specs),
   n.chains = 2,

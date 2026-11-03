@@ -19,7 +19,6 @@ from GitHub, and then `muppet` can also be installed from GitHub. This
 may be done as follows:
 
 ``` r
-
 # install.packages("remotes")  # if you don't have remotes installed
 
 # Install mcmcplots from maintained fork

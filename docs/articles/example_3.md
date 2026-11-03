@@ -20,7 +20,6 @@ out-of-sample scoring).
 Load the package and extract the data for this example.
 
 ``` r
-
 library(muppet)
 data(sim.IRT, package = "muppet")
 ```
@@ -34,7 +33,6 @@ fixed mean and variance. All the loadings (discriminations) and location
 parameters are estimated.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.1 <- "
   F1 by It1-It10*;
   [It1$1-It10$1];
@@ -48,7 +46,6 @@ specify them as such for the Mplus VARIABLE command. To do so, define an
 R object with the desired text for the Mplus input file.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.1 <- "
      CATEGORICAL =
         It1-It10
@@ -64,7 +61,6 @@ relevant item responses from the raw dataset, namely those from Sample A
 responding to items 1-10.
 
 ``` r
-
 library(dplyr)
 
 fragment.1.specs <- list(
@@ -95,7 +91,6 @@ not be “brought forward” by looking at the fitted results from
 Fragment 1. So they need to be specified here as well.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.2 <- "
   F1@1;
   [F1@0];
@@ -108,7 +103,6 @@ the desired text for the Mplus input file as being just as it was in
 Fragment 1.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.2 <- Mplus.VARIABLE.syntax.fragment.1
 ```
 
@@ -127,7 +121,6 @@ that were used in Fragment 1. That is, we are conducting in-sample
 scoring conditional on the calibration in Fragment 1.
 
 ``` r
-
 library(dplyr)
 
 fragment.2.specs <- list(
@@ -158,7 +151,6 @@ variance. These were included in Fragment 1 as well, but as discussed
 above also need to be here to preserve this constraint.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.3 <- "
   F1@1;
   [F1@0];
@@ -171,7 +163,6 @@ the desired text for the Mplus input file as being just as it was in
 Fragment 2.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.3 <- Mplus.VARIABLE.syntax.fragment.2
 ```
 
@@ -183,7 +174,6 @@ used in the previous fragment. Note also that by setting
 fragment conditional on Fragment 1, but not conditional on Fragment 2.
 
 ``` r
-
 library(dplyr)
 
 fragment.3.specs <- list(
@@ -210,7 +200,6 @@ above. The rest of the arguments communicate specifications for running
 MCMC and saving output. Running this code will write out output files.
 
 ``` r
-
 MUPPET.modular(
     fragments = list(fragment.1.specs, fragment.2.specs, fragment.3.specs),
     n.chains = 2,

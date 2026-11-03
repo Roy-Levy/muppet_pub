@@ -33,7 +33,6 @@ antecedent fragments rather than re-fit those fragments.
 Load the package and extract the data for this example.
 
 ``` r
-
 library(muppet)
 data(sim.IRT, package = "muppet")
 ```
@@ -47,7 +46,6 @@ as having a fixed mean and variance. All the loadings (discriminations)
 and location parameters are estimated.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.1 <- "
   F1 by It1-It10*;
   [It1$1-It10$1];
@@ -61,7 +59,6 @@ specify them as such for the Mplus VARIABLE command. To do so, define an
 R object with the desired text for the Mplus input file.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.1 <- "
      CATEGORICAL =
         It1-It10
@@ -73,7 +70,6 @@ Now define the data for this fragment, as the item responses from Sample
 A to items 1-10.
 
 ``` r
-
 library(dplyr)
 data.fragment.1 =
   bind_cols(
@@ -90,7 +86,6 @@ this list of specifications, we are fitting this fragment without
 conditioning on any other fragment.
 
 ``` r
-
 fragment.1.specs <- list(
   name = "Sample A Items 1-10 Calibration",
   model.syntax = Mplus.MODEL.syntax.fragment.1,
@@ -114,7 +109,6 @@ not be “brought forward” by looking at the fitted results from
 Fragment 1. So they need to be specified here as well.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.2 <- "
   F1 by It11-It15*;
   [It11$1-It15$1];
@@ -132,7 +126,6 @@ are carrying forward the results from Fragment 1, which include
 parameters and data for items 1-5.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.2 <- "
      CATEGORICAL =
         It1-It15
@@ -145,7 +138,6 @@ Fragment 1 (item responses from Sample A to items 1-10) and the new data
 for this fragment (item responses from Sample C to items 6-15).
 
 ``` r
-
 library(dplyr)
 temp.data.2 =
   bind_cols(
@@ -165,7 +157,6 @@ this list of specifications, we are fitting this fragment conditioning
 on Fragment 1.
 
 ``` r
-
 fragment.2.specs <- list(
   name = "Sample C Items 11-15 Calibration",
   model.syntax = Mplus.MODEL.syntax.fragment.2,
@@ -182,7 +173,6 @@ responses from a new sample (Sample D), treating previous items as
 anchor items. The model syntax is similar to that for Fragment 2.
 
 ``` r
-
 Mplus.MODEL.syntax.fragment.3 <- "
   F1 by It16-It20*;
   [It16$1-It20$1];
@@ -200,7 +190,6 @@ are carrying forward the results from the previous fragments, which
 include parameters and data for the other items.
 
 ``` r
-
 Mplus.VARIABLE.syntax.fragment.3 <- "
      CATEGORICAL =
         It1-It20
@@ -213,7 +202,6 @@ previous fragments (namely, Fragment 2) and the new data for this
 fragment (item responses from Sample D to items 11-20).
 
 ``` r
-
 library(dplyr)
 temp.data.3 =
   bind_cols(
@@ -233,7 +221,6 @@ in this list of specifications, we are fitting this fragment
 conditioning on Fragments 1 and 2.
 
 ``` r
-
 fragment.3.specs <- list(
   name = "Sample D Items 16-20 Calibration",
   model.syntax = Mplus.MODEL.syntax.fragment.3,
@@ -271,7 +258,6 @@ that Fragments 1 and 2 are not to be fit, we change their specifications
 to indicate they are not to be fit.
 
 ``` r
-
 fragment.1.specs$to.fit = FALSE
 fragment.2.specs$to.fit = FALSE
 ```
@@ -280,7 +266,6 @@ When running the MUPPET analysis below, the results for Fragments 1 and
 2 will be read in to fit Fragment 2.
 
 ``` r
-
 MUPPET.modular(
     fragments = list(fragment.1.specs, fragment.2.specs,fragment.3.specs),
     n.chains = 2,
