@@ -13,13 +13,13 @@
 ## Citation
 
 Levy R, Li Y (2026). *muppet: Measurement and Uncertainty Preserving
-ParamETric (MUPPET) Modeling*. R package version 0.2.0,
+ParamETric (MUPPET) Modeling*. R package version 0.2.1,
 <https://roy-levy.github.io/muppet_pub/>.
 
     @Manual{,
       title = {muppet: Measurement and Uncertainty Preserving ParamETric (MUPPET) Modeling},
       author = {Roy Levy and Yadi Li},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.2.1},
       url = {https://roy-levy.github.io/muppet_pub/},
     }
